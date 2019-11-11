@@ -8,14 +8,12 @@ import { TransferHttpCacheModule } from '@nguniversal/common';
 import { HttpClientModule } from '@angular/common/http';
 import { NgtUniversalModule } from '@ng-toolkit/universal';
 import { MainComponent } from './main/main.component';
-import { SafePipe } from './pipes/safe.pipe';
 import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
     AppComponent,
-    MainComponent,
-    SafePipe
+    MainComponent
   ],
   imports: [
     BrowserModule.withServerTransition({ appId: 'serverApp' }),

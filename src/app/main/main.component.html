@@ -208,7 +208,7 @@
             <div class="wd-100p ht-100p">
               <video #video class="wd-100p img-fit-cover img-object-top rounded-left" controls autoplay
                 poster="../../assets/imgs/abc.gif" *ngIf="!chooseThumbnail">
-                <source [src]="dataSelected.video_link | safe: 'url'" type="video/mp4">
+                <source [src]="dataSelected.video_link" type="video/mp4">
                 Your browser does not support HTML5 video.
               </video>
               <video #video class="wd-100p img-fit-cover img-object-top rounded-left" controls autoplay
