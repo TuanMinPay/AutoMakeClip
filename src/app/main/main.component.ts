@@ -33,8 +33,10 @@ export class MainComponent implements OnInit {
     description: null,
     tags: null,
     list_video: [],
-    thumb_style: null,
-    thumb_arr: []
+    thumb_style: {
+      style: null,
+      thumb_arr: []
+    },
   }
 
   validateFormData: any = {
@@ -220,11 +222,11 @@ export class MainComponent implements OnInit {
 
   chooseStyleThumbnail(item: { id: any; group: number; }) {
     this.styleSelected = item.id;
-    this.dataVideo.thumb_style = item;
+    this.dataVideo.thumb_style.style = item;
     switch (item.group) {
       case 3:
-        if (this.dataVideo.thumb_arr.length != 0 && this.style_3.length != 0) {
-          this.dataVideo.thumb_arr = this.style_3;
+        if (this.dataVideo.thumb_style.thumb_arr.length != 0 && this.style_3.length != 0) {
+          this.dataVideo.thumb_style.thumb_arr = this.style_3;
         } else {
           for (let i = 1; i <= item.group; i++) {
             let obj = {
@@ -233,14 +235,14 @@ export class MainComponent implements OnInit {
             }
             this.style_3.push(obj);
             if (i == item.group) {
-              this.dataVideo.thumb_arr = this.style_3;
+              this.dataVideo.thumb_style.thumb_arr = this.style_3;
             }
           }
         }
         break;
       case 5:
-        if (this.dataVideo.thumb_arr.length != 0 && this.style_5.length != 0) {
-          this.dataVideo.thumb_arr = this.style_5;
+        if (this.dataVideo.thumb_style.thumb_arr.length != 0 && this.style_5.length != 0) {
+          this.dataVideo.thumb_style.thumb_arr = this.style_5;
         } else {
           for (let i = 1; i <= item.group; i++) {
             let obj = {
@@ -256,7 +258,7 @@ export class MainComponent implements OnInit {
                   }
                 });
               }
-              this.dataVideo.thumb_arr = this.style_5;
+              this.dataVideo.thumb_style.thumb_arr = this.style_5;
             }
           }
         }
@@ -284,14 +286,14 @@ export class MainComponent implements OnInit {
   }
 
   dropThumbnail(event: CdkDragDrop<any[]>) {
-    moveItemInArray(this.dataVideo.thumb_arr, event.previousIndex, event.currentIndex);
+    moveItemInArray(this.dataVideo.thumb_style.thumb_arr, event.previousIndex, event.currentIndex);
   }
 
   public async capture() {
     this.canvas.nativeElement.width = this.video.nativeElement.videoWidth;
     this.canvas.nativeElement.height = this.video.nativeElement.videoHeight;
     await this.canvas.nativeElement.getContext("2d").drawImage(this.video.nativeElement, 0, 0, this.video.nativeElement.videoWidth, this.video.nativeElement.videoHeight);
-    this.dataVideo.thumb_arr.forEach(item => {
+    this.dataVideo.thumb_style.thumb_arr.forEach(item => {
       if (item.id == this.idThumbnailSelect) {
         item.image = this.canvas.nativeElement.toDataURL("image/png");
         this.resetViewVideo();
