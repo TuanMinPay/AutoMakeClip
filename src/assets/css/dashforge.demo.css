@@ -100,15 +100,15 @@
     content: attr(data-label);
     display: block;
     position: absolute;
-    top: -6px;
+    top: -12px;
     left: 5px;
-    font-size: 8px;
-    font-weight: 600;
+    font-size: 16px;
+    font-weight: bold;
     font-family: -apple-system, BlinkMacSystemFont, "Inter UI", Roboto, sans-serif;
     letter-spacing: 1px;
     text-transform: uppercase;
     background-color: inherit;
-    color: #8392a5;
+    color: #000;
     padding: 0 5px; }
   .df-example.df-inverse {
     background-color: #1c273c;
