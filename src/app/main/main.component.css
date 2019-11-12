@@ -1,4 +1,6 @@
 .badge.badge-secondary{margin-right:3px}
 .item-video{margin-bottom:10px}
-.thumb-style{justify-content:space-between}
+.example-box{cursor:move}
+.thumb-style{justify-content:space-evenly}
 .active-thumbnail{border:3px solid #4d90fe}
+.title-video{overflow:hidden;text-overflow:ellipsis}

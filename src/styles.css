@@ -1,3 +1,2 @@
 .img-srs{width:100%;height:100%;object-fit:cover}
-.action-btn{position:absolute;}
-.action-btn button{margin:0 3px}
+.action-btn{position:absolute;z-index:1;bottom:63px;right:10px;font-size:16px;padding:0 8px}

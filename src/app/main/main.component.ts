@@ -1,6 +1,9 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import axios from 'axios';
 import { environment } from '../../environments/environment';
+import { registerLocaleData } from '@angular/common';
+import vi from '@angular/common/locales/vi';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-main',
@@ -34,13 +37,45 @@ export class MainComponent implements OnInit {
     thumb_arr: []
   }
 
+  validateFormData: any = {
+    title: false,
+    description: false,
+    tags: false
+  }
+
+  validateFunc() {
+    var x = true;
+    if (this.dataVideo.title == null) {
+      this.validateFormData.title = true;
+      x = false;
+    } else {
+      this.validateFormData.title = false;
+    }
+    if (this.dataVideo.description == null) {
+      this.validateFormData.description = true;
+      x = false;
+    } else {
+      this.validateFormData.description = false;
+    }
+    if (this.dataVideo.tags == null) {
+      this.validateFormData.tags = true;
+      x = false;
+    } else {
+      this.validateFormData.tags = false;
+    }
+    return x;
+  }
+
   save() {
-    console.log(this.dataVideo);
-    
+    if (this.validateFunc()) {
+      console.log(this.dataVideo);
+    }
+
   }
 
   addVideoToList(item: any) {
     this.dataVideo.list_video.push(item);
+    this.resetViewVideo();
   }
 
   removeVideoFromList(item: any) {
@@ -157,47 +192,99 @@ export class MainComponent implements OnInit {
   }
   dataSelected: any = null;
 
-  previewVideo(id: any) {
-    this.dataSelected = null;
-    var data: any = this.getItemVideo(id);
-    this.dataSelected = data;
-    console.log(data);
+  openModal: boolean = false;
+
+  captureImage(id: any) {
+    this.openModal = true;
+    this.dataSelected = this.dataVideo.list_video.filter((item: { id: any; }) => {
+      return item.id === id;
+    })[0];
+  }
+
+  previewVideo(id: any, open: boolean) {
+    this.openModal = open;
+    this.dataSelected = this.getItemVideo(id);
+  }
+
+  resetViewVideo() {
+    setTimeout(() => {
+      this.dataSelected = null;
+      this.openModal = false;
+      this.chooseThumbnail = false;
+    }, 100);
   }
 
   styleSelected: any = null;
-
-  colBind: any = null;
+  style_3: any = [];
+  style_5: any = [];
 
   chooseStyleThumbnail(item: { id: any; group: number; }) {
-    this.dataVideo.thumb_arr = [];
     this.styleSelected = item.id;
-    if (item.group == 3) {
-      this.colBind = 4;
-    } else if (item.group == 5) {
-      this.colBind = 2;
-    }
-    for (let i = 0; i < item.group; i++) {
-      let obj = {
-        id: (i + 1),
-        image: "https://i.imgur.com/FWJMQaD.jpg"
-      }
-      this.dataVideo.thumb_arr.push(obj);
+    this.dataVideo.thumb_style = item;
+    switch (item.group) {
+      case 3:
+        if (this.dataVideo.thumb_arr.length != 0 && this.style_3.length != 0) {
+          this.dataVideo.thumb_arr = this.style_3;
+        } else {
+          for (let i = 1; i <= item.group; i++) {
+            let obj = {
+              id: i,
+              image: "/assets/imgs/default_thumbnail.jpg"
+            }
+            this.style_3.push(obj);
+            if (i == item.group) {
+              this.dataVideo.thumb_arr = this.style_3;
+            }
+          }
+        }
+        break;
+      case 5:
+        if (this.dataVideo.thumb_arr.length != 0 && this.style_5.length != 0) {
+          this.dataVideo.thumb_arr = this.style_5;
+        } else {
+          for (let i = 1; i <= item.group; i++) {
+            let obj = {
+              id: i,
+              image: "/assets/imgs/default_thumbnail.jpg"
+            }
+            this.style_5.push(obj);
+            if (i == item.group) {
+              if (this.style_3.length != 0) {
+                this.style_3.forEach((item, index) => {
+                  if (item.image.indexOf(";base64,") != -1) {
+                    this.style_5[index].image = item.image;
+                  }
+                });
+              }
+              this.dataVideo.thumb_arr = this.style_5;
+            }
+          }
+        }
+        break;
+      default:
+        break;
     }
   }
 
   chooseThumbnail: boolean = false;
   idThumbnailSelect: any = null;
 
-  @ViewChild("target") target: ElementRef;
-
   editThumbnail(id) {
     this.idThumbnailSelect = id;
     this.chooseThumbnail = true;
-    this.target.nativeElement.scrollIntoView();
   }
 
   ngOnInit() {
     this.listThumbnailStyle = environment.listStyle;
+    registerLocaleData(vi);
+  }
+
+  dropChooseResult(event: CdkDragDrop<any[]>) {
+    moveItemInArray(this.dataVideo.list_video, event.previousIndex, event.currentIndex);
+  }
+
+  dropThumbnail(event: CdkDragDrop<any[]>) {
+    moveItemInArray(this.dataVideo.thumb_arr, event.previousIndex, event.currentIndex);
   }
 
   public async capture() {
@@ -207,9 +294,7 @@ export class MainComponent implements OnInit {
     this.dataVideo.thumb_arr.forEach(item => {
       if (item.id == this.idThumbnailSelect) {
         item.image = this.canvas.nativeElement.toDataURL("image/png");
-        setTimeout(() => {
-          this.chooseThumbnail = false;
-        }, 1000);
+        this.resetViewVideo();
       }
     });
   }

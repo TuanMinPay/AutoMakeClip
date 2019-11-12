@@ -76,7 +76,7 @@
 
 .filemgr-sidebar-body {
   position: absolute;
-  top: 55px;
+  top: 0;
   left: 0;
   right: 0;
   bottom: 0; }
@@ -207,11 +207,11 @@
   font-size: 36px; }
   @media (min-width: 576px) {
     .card-file-thumb {
-      height: 100px;
+      height: 180px;
       font-size: 40px; } }
   @media (min-width: 992px) {
     .card-file-thumb {
-      height: 120px;
+      height: 200px;
       font-size: 48px; } }
 
 .media-folder {

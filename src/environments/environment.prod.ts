@@ -16,7 +16,7 @@ export const environment = {
   }, {
     id: 3,
     group: 3,
-    tilt: "none",
+    tilt: "center",
     name: "Style 3",
     image: "https://i.imgur.com/FWJMQaD.jpg"
   }, {

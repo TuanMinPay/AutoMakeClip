@@ -1,66 +1,15 @@
 <div class="filemgr-wrapper">
   <div class="filemgr-sidebar">
-    <div class="filemgr-sidebar-header">
-      <div class="dropdown dropdown-icon flex-fill">
-        <button class="btn btn-xs btn-block btn-white" data-toggle="dropdown">New <i
-            data-feather="chevron-down"></i></button>
-        <div class="dropdown-menu tx-13">
-          <a href="javascript:void(0)" class="dropdown-item"><i data-feather="folder"></i><span>Folder</span></a>
-          <a href="javascript:void(0)" class="dropdown-item"><i data-feather="file"></i><span>Notes</span></a>
-          <div class="dropdown-divider"></div>
-          <a href="javascript:void(0)" class="dropdown-item"><i data-feather="file-text"></i><span>Word
-              Document</span></a>
-          <a href="javascript:void(0)" class="dropdown-item"><i data-feather="file-text"></i><span>Powepoint</span></a>
-          <a href="javascript:void(0)" class="dropdown-item"><i data-feather="file-text"></i><span>Excel
-              Spreadsheet</span></a>
-        </div><!-- dropdown-menu -->
-      </div><!-- dropdown -->
-      <div class="dropdown dropdown-icon flex-fill mg-l-10">
-        <button class="btn btn-xs btn-block btn-primary" data-toggle="dropdown">Upload <i
-            data-feather="chevron-down"></i></button>
-        <div class="dropdown-menu tx-13">
-          <a href="javascript:void(0)" class="dropdown-item"><i data-feather="file"></i><span>File</span></a>
-          <a href="javascript:void(0)" class="dropdown-item"><i data-feather="folder"></i><span>Folder</span></a>
-        </div><!-- dropdown-menu -->
-      </div><!-- dropdown -->
-    </div><!-- filemgr-sidebar-header -->
     <div class="filemgr-sidebar-body">
       <div class="pd-t-20 pd-b-10 pd-x-10">
-        <label class="tx-sans tx-uppercase tx-medium tx-10 tx-spacing-1 tx-color-03 pd-l-10">My Drive</label>
-        <nav class="nav nav-sidebar tx-13">
-          <a href="javascript:void(0)" class="nav-link active"><i data-feather="folder"></i> <span>All Files</span></a>
-          <a href="javascript:void(0)" class="nav-link"><i data-feather="monitor"></i> <span>My Devices</span></a>
-          <a href="javascript:void(0)" class="nav-link"><i data-feather="clock"></i> <span>Recents</span></a>
-          <a href="javascript:void(0)" class="nav-link"><i data-feather="star"></i> <span>Important</span></a>
-          <a href="javascript:void(0)" class="nav-link"><i data-feather="trash"></i> <span>Deleted Files</span></a>
+        <label class="tx-sans tx-uppercase tx-medium tx-10 tx-spacing-1 tx-color-03 pd-l-10">Step</label>
+        <nav class="nav nav-sidebar nav-pills tx-13" id="navBar">
+          <a href="#searchClip" class="nav-link active"><i data-feather="anchor"></i> <span>Search Clip</span></a>
+          <a href="#chooseClip" class="nav-link"><i data-feather="activity"></i> <span>Choose Clip</span></a>
+          <a href="#makeThumbnail" class="nav-link"><i data-feather="image"></i> <span>Make Thumbnail</span></a>
+          <a href="#videoInfomation" class="nav-link"><i data-feather="clipboard"></i> <span>Video Infomation</span></a>
+          <a href="#saveVideo" class="nav-link"><i data-feather="aperture"></i> <span>Save</span></a>
         </nav>
-      </div>
-      <div class="pd-10">
-        <label class="tx-sans tx-uppercase tx-medium tx-10 tx-spacing-1 tx-color-03 pd-l-10">File Library</label>
-        <nav class="nav nav-sidebar tx-13">
-          <a href="javascript:void(0)" class="nav-link"><i data-feather="file"></i> <span>Documents</span></a>
-          <a href="javascript:void(0)" class="nav-link"><i data-feather="image"></i> <span>Images</span></a>
-          <a href="javascript:void(0)" class="nav-link"><i data-feather="video"></i> <span>Videos</span></a>
-          <a href="javascript:void(0)" class="nav-link"><i data-feather="music"></i> <span>Audio</span></a>
-          <a href="javascript:void(0)" class="nav-link"><i data-feather="package"></i> <span>Zip Files</span></a>
-        </nav>
-      </div>
-      <div class="pd-y-10 pd-x-20">
-        <label class="tx-sans tx-uppercase tx-medium tx-10 tx-spacing-1 tx-color-03 mg-b-15">Storage Status</label>
-
-        <div class="media">
-          <i data-feather="database" class="wd-30 ht-30"></i>
-          <div class="media-body mg-l-10">
-            <div class="tx-12 mg-b-4">10.2GB used of 50GB</div>
-            <div class="progress ht-3 mg-b-20">
-              <div class="progress-bar wd-15p" role="progressbar" aria-valuenow="15" aria-valuemin="0"
-                aria-valuemax="100"></div>
-            </div>
-          </div><!-- media-body -->
-        </div><!-- media -->
-        <p class="tx-12">Get 2TB (2,000GB) of storage now and get 40% off. Offers ends soon. <a
-            href="javascript:void(0)">Learn more</a>
-        </p>
       </div>
     </div><!-- filemgr-sidebar-body -->
   </div><!-- filemgr-sidebar -->
@@ -70,25 +19,31 @@
       <i data-feather="search"></i>
       <div class="search-form">
         <input type="search" class="form-control" placeholder="Search keyword here" #keyword
-          (keyup.enter)="getVideoByKeyword(keyword.value)">
+          (keyup.enter)="getVideoByKeyword(keyword.value)" value="makeup">
       </div><!-- search-form -->
     </div><!-- filemgr-content-header -->
-    <div class="filemgr-content-body">
-      <div class="pd-20 pd-lg-25 pd-xl-30" *ngIf="searchResults != null">
+    <div class="filemgr-content-body" data-spy="scroll" data-target="#navBar">
+      <div class="pd-20 pd-lg-25 pd-xl-30" *ngIf="searchResults != null" id="searchClip">
         <div data-label="Search Results" class="df-example">
           <div class="row row-xs">
-            <div class="col-2 item-video" *ngFor="let item of searchResults?.results">
+            <div class="col-2 item-video" *ngFor="let item of searchResults?.results"
+              (mouseenter)="previewVideo(item.id, false)">
               <div class="card card-file" (mouseenter)="showAction(item.id)" (mouseleave)="hideAction()">
                 <div class="card-file-thumb tx-danger">
-                  <div class="action-btn" *ngIf="actionDisplay == item.id">
-                    <button type="button" class="btn btn-xs btn-primary" (click)="previewVideo(item.id)"
-                      data-toggle="modal" data-target="#modalSplitColumn">Preview</button>
-                    <button class="btn btn-xs btn-success" (click)="addVideoToList(item)">Add</button>
-                  </div>
-                  <img [src]="item.thumbnail_url" class="img-srs">
+                  <button class="btn btn-xs btn-success action-btn" (click)="addVideoToList(item)"
+                    *ngIf="actionDisplay == item.id">+</button>
+                  <img [src]="item.thumbnail_url" class="img-srs" *ngIf="actionDisplay != item.id">
+                  <video #prv *ngIf="actionDisplay == item.id"
+                    class="wd-100p img-fit-cover img-object-top rounded-left img-srs" autoplay
+                    poster="../../assets/imgs/abc.gif" crossorigin="anonymous" style="object-fit: contain;">
+                    <source [src]="dataSelected?.video_link" type="video/mp4">
+                    Your browser does not support HTML5 video.
+                  </video>
                 </div>
                 <div class="card-body">
-                  <h6><a href="javascript:void(0)" class="link-02">{{item.text}}</a></h6>
+                  <h6 (click)="previewVideo(item.id, true)" data-toggle="modal" data-target="#modalSplitColumn"><a
+                      href="javascript:void(0)" class="link-02">{{item.text}}</a>
+                  </h6>
                   <span>{{item.region}}</span>
                 </div>
               </div>
@@ -104,16 +59,18 @@
         </div>
       </div>
 
-      <div class="pd-20 pd-lg-25 pd-xl-30" *ngIf="dataVideo.list_video.length > 0" #target>
+      <div class="pd-20 pd-lg-25 pd-xl-30" *ngIf="dataVideo.list_video.length > 0" id="chooseClip">
         <div data-label="Choose Results" class="df-example">
-          <div class="row row-xs">
-            <div class="col-2 item-video" *ngFor="let item of dataVideo.list_video">
+          <div class="row row-xs example-boundary" cdkDropList cdkDropListOrientation="horizontal"
+            (cdkDropListDropped)="dropChooseResult($event)">
+            <div class="col-2 item-video example-box" *ngFor="let item of dataVideo.list_video"
+              cdkDragBoundary=".example-boundary" cdkDrag>
               <div class="card card-file" (mouseenter)="showActionRemove(item.id)" (mouseleave)="hideActionRemove()">
                 <div class="card-file-thumb tx-danger">
-                  <div class="action-btn" *ngIf="actionRemove == item.id">
-                    <button class="btn btn-xs btn-success" (click)="previewVideo(item.id)" data-toggle="modal"
-                      data-target="#modalSplitColumn" *ngIf="chooseThumbnail">Make Thumb</button>
-                    <button class="btn btn-xs btn-danger" (click)="removeVideoFromList(item)">Del</button>
+                  <div class="action-btn" *ngIf="actionRemove == item.id || chooseThumbnail">
+                    <button class="btn btn-xs btn-success mg-r-5" (click)="captureImage(item.id)" data-toggle="modal"
+                      data-target="#modalSplitColumn" *ngIf="chooseThumbnail">Capture</button>
+                    <button class="btn btn-xs btn-danger" (click)="removeVideoFromList(item)">-</button>
                   </div>
                   <img [src]="item.thumbnail_url" class="img-srs">
                 </div>
@@ -127,7 +84,7 @@
         </div>
       </div>
 
-      <div class="pd-20 pd-lg-25 pd-xl-30" *ngIf="dataVideo.list_video.length > 0">
+      <div class="pd-20 pd-lg-25 pd-xl-30" *ngIf="dataVideo.list_video.length > 0" id="makeThumbnail">
         <div data-label="Thumbnail Style" class="df-example">
           <div class="row thumb-style">
             <div class="col-2" *ngFor="let item of listThumbnailStyle">
@@ -137,13 +94,15 @@
             </div>
           </div>
 
-          <div class="row mt-3 df-example thumb-style" data-label="Choose Thumbnail Image"
-            *ngIf="styleSelected != null">
-            <figure class="pos-relative mg-b-0 col-{{colBind}}" *ngFor="let item of dataVideo.thumb_arr;">
+          <div class="row mt-3 df-example thumb-style example-boundary" data-label="Choose Thumbnail Image"
+            *ngIf="styleSelected != null" cdkDropList cdkDropListOrientation="horizontal"
+            (cdkDropListDropped)="dropThumbnail($event)">
+            <figure class="pos-relative mg-b-0 col-2 example-box" *ngFor="let item of dataVideo.thumb_arr;"
+              cdkDragBoundary=".example-boundary" cdkDrag>
               <img [src]="item.image" class="img-fit-cover">
               <figcaption class="pos-absolute b-0 l-0 wd-100p pd-20 d-flex justify-content-center">
                 <div class="btn-group">
-                  <button type="button" class="btn btn-primary btn-icon" (click)="editThumbnail(item.id)">Edit</button>
+                  <a href="#chooseClip" class="btn btn-primary btn-icon" (click)="editThumbnail(item.id)">Edit</a>
                 </div>
               </figcaption>
             </figure>
@@ -151,26 +110,41 @@
         </div>
       </div>
 
-      <div class="pd-20 pd-lg-25 pd-xl-30" *ngIf="styleSelected != null">
+      <div class="pd-20 pd-lg-25 pd-xl-30" *ngIf="styleSelected != null" id="videoInfomation">
         <div data-label="Video Infomation" class="df-example demo-forms">
           <div class="form-group">
-            <label class="d-block">Title</label>
-            <input type="text" name="title" [(ngModel)]="dataVideo.title" class="form-control" placeholder="Title">
+            <label class="d-block">Title<span class="tx-danger">*</span></label>
+            <input type="text" name="title" [(ngModel)]="dataVideo.title"
+              class="form-control {{validateFormData.title ? 'parsley-error' : ''}}" placeholder="Title"
+              (keyup)="validateFormData.title = false">
+            <ul class="parsley-errors-list filled" *ngIf="validateFormData.title">
+              <li class="parsley-required">This value is required.</li>
+            </ul>
           </div>
           <div class="form-group">
-            <label class="d-block">Description</label>
-            <textarea name="description" [(ngModel)]="dataVideo.description" class="form-control" id="description" cols="30" rows="10"></textarea>
+            <label class="d-block">Description<span class="tx-danger">*</span></label>
+            <textarea name="description" [(ngModel)]="dataVideo.description"
+              class="form-control {{validateFormData.description ? 'parsley-error' : ''}}" id="description" cols="30"
+              rows="10" (keyup)="validateFormData.description = false"></textarea>
+            <ul class="parsley-errors-list filled" *ngIf="validateFormData.description">
+              <li class="parsley-required">This value is required.</li>
+            </ul>
           </div>
           <div class="form-group">
-              <label class="d-block">Tag (separated by commas)</label>
-              <input type="text" name="tags" [(ngModel)]="dataVideo.tags" class="form-control" placeholder="halloween, ghost, ...etc">
-            </div>
+            <label class="d-block">Tag (separated by commas)<span class="tx-danger">*</span></label>
+            <input type="text" name="tags" [(ngModel)]="dataVideo.tags"
+              class="form-control {{validateFormData.tags ? 'parsley-error' : ''}}"
+              placeholder="halloween, ghost, ...etc" (keyup)="validateFormData.tags = false">
+            <ul class="parsley-errors-list filled" *ngIf="validateFormData.tags">
+              <li class="parsley-required">This value is required.</li>
+            </ul>
+          </div>
         </div>
       </div>
 
-      <div class="pd-20 pd-lg-25 pd-xl-30">
-          <button type="button" class="btn btn-success" (click)="save()">Save</button>
-          <button type="button" class="btn btn-danger mg-l-10">Reset All</button>
+      <div class="pd-20 pd-lg-25 pd-xl-30" id="saveVideo" *ngIf="styleSelected != null">
+        <button type="button" class="btn btn-success" (click)="save()">Save</button>
+        <button type="button" class="btn btn-danger mg-l-10">Reset All</button>
       </div>
 
     </div><!-- filemgr-content-body -->
@@ -178,44 +152,22 @@
 
 </div><!-- filemgr-wrapper -->
 
-<div class="pos-absolute t-10 r-10">
-  <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="toast-header">
-      <h6 class="tx-inverse tx-14 mg-b-0 mg-r-auto">Notification</h6>
-      <small>11 mins ago</small>
-      <button type="button" class="ml-2 mb-1 close tx-normal" data-dismiss="toast" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="toast-body">
-      Hello, world! This is a toast message.
-    </div>
-  </div>
-</div>
-
 <div class="modal fade" id="modalSplitColumn" aria-labelledby="modalSplitColumn" tabindex="-1" role="dialog"
   aria-hidden="true" data-backdrop="static" data-keyboard="false">
   <div class="modal-dialog modal-dialog-centered mx-wd-sm-650" role="document">
-    <div class="modal-content bd-0 bg-transparent">
-      <div class="modal-body pd-0">
-        <a href="javascript:void(0)" (click)="dataSelected = null" role="button"
-          class="close pos-absolute t-15 r-15 z-index-10" data-dismiss="modal" aria-label="Close">
+    <div class="modal-content bd-0 bg-transparent" *ngIf="dataSelected != null">
+      <div class="modal-body pd-0" *ngIf="openModal">
+        <a href="javascript:void(0)" data-dismiss="modal" (click)="resetViewVideo()" role="button"
+          class="close pos-absolute t-15 r-15 z-index-10" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </a>
 
-        <div class="row no-gutters" *ngIf="dataSelected != null">
+        <div class="row no-gutters">
           <div class="col-3 col-sm-5 col-md-6 col-lg-5 rounded-left">
             <div class="wd-100p ht-100p">
               <video #video class="wd-100p img-fit-cover img-object-top rounded-left" controls autoplay
-                poster="../../assets/imgs/abc.gif" *ngIf="!chooseThumbnail">
-                <source [src]="dataSelected.video_link" type="video/mp4">
-                Your browser does not support HTML5 video.
-              </video>
-              <video #video class="wd-100p img-fit-cover img-object-top rounded-left" controls autoplay
-                poster="../../assets/imgs/abc.gif" crossorigin="anonymous" *ngIf="chooseThumbnail">
-                <source
-                  src="https://v16.tiktokcdn.com/7599650b4397facf58379d9d7995ead1/5dc931fd/video/n/v0102/63b5b7de3a2447cb95b2bd13b33271a3/?a=1180&br=1292&cr=0&cs=0&dr=3&ds=3&er=&l=2019111104032501011513120717A53A57&lr=tiktok&qs=0&rc=ajM7PHlzazQ4cDMzZjgzM0ApZWdkODg5OGUzNzUzNzM2ZGdpYC8xZmNoMnNfLS1hLzRzc2MtMl5fLTNhNC8uMDE1LjM6Yw%3D%3D"
-                  type="video/mp4">
+                poster="../../assets/imgs/abc.gif" crossorigin="anonymous">
+                <source [src]="dataSelected?.video_link" type="video/mp4">
                 Your browser does not support HTML5 video.
               </video>
             </div>
@@ -223,13 +175,16 @@
           <div class="col-9 col-sm-7 col-md-6 col-lg-7 bg-white rounded-right">
             <canvas #canvas id="canvas" style="display: none;"></canvas>
             <div class="ht-100p d-flex flex-column justify-content-center pd-20 pd-sm-30 pd-md-40">
-              <h3 class="tx-16 tx-sm-20 tx-md-24 mg-b-15 mg-md-b-20">{{dataSelected.text}}</h3>
+              <h3 class="tx-16 tx-sm-20 tx-md-24 mg-b-15 mg-md-b-20 title-video">{{dataSelected.text}}</h3>
               <p class="tx-14 tx-md-16 tx-color-02">
                 Tags:
                 <span class="badge badge-secondary" *ngFor="let item of dataSelected?.tags">{{item.name}}</span>
               </p>
-              <p class="tx-14 tx-md-16 tx-color-02">Region: {{dataSelected?.region}}</p>
-              <p class="tx-14 tx-md-16 tx-color-02">Author: {{dataSelected?.author.name}}</p>
+              <p class="tx-14 tx-md-16 tx-color-02">Region: {{dataSelected.region}}</p>
+              <p class="tx-14 tx-md-16 tx-color-02">Like: {{dataSelected.like_count  | number:'':'vi'}} -
+                {{dataSelected.comment_count  | number:'':'vi'}} comments</p>
+              <p class="tx-14 tx-md-16 tx-color-02">Author: {{dataSelected.author.name}} -
+                {{dataSelected.author.following | number:'':'vi'}} following</p>
               <a href="javascript:void(0)" class="btn btn-success btn-block btn-uppercase" data-dismiss="modal"
                 (click)="addVideoToList(dataSelected)" *ngIf="!chooseThumbnail">Add To List</a>
               <a href="javascript:void(0)" class="btn btn-success btn-block btn-uppercase" (click)="capture()"
