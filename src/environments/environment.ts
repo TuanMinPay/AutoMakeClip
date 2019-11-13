@@ -4,7 +4,9 @@
 
 export const environment = {
   production: false,
-  getByKeyword(limit: any, region: { trim: () => void; }, order_by: { trim: () => void; }, order_type: any, tags: { trim: () => void; }, page: any) { return `http://54.37.84.131:8088/api/v1/video/?limit=${limit}&region=${region.trim()}&order_by=${order_by.trim()}&order_type=${order_type}&tags_name=${tags.trim()}&page=${page}` },
+  getByKeyword(region: any, order_by: any, order_type: any, tags: any, page: any) {
+    return `http://54.37.84.131:8088/api/v1/video/?order_type=${order_type}&tags_name=${tags}&page=${page}${(region != null) ? `&region=${region}` : ''}${(order_by != null) ? `&order_by=${order_by}` : ''}`
+  },
   listStyle: [{
     id: 1,
     group: 3,

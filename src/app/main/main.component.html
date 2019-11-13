@@ -15,6 +15,46 @@
   </div><!-- filemgr-sidebar -->
 
   <div class="filemgr-content">
+    <div class="filemgr-content-header">
+      <div class="form-row" style="width: 100%;">
+        <div class="form-group col-md-4">
+          <label>Keyword <span class="tx-danger">*</span></label>
+          <input type="text" class="form-control {{validateSearch.keyword ? 'parsley-error' : ''}}"
+            [(ngModel)]="searchObj.keyword" name="keyword" placeholder="halloween"
+            (keyup)="validateSearch.keyword = false" (keyup.enter)="search()">
+        </div>
+        <div class="form-group col-md-2">
+          <label>Region</label>
+          <input type="text" [(ngModel)]="searchObj.region" name="region" class="form-control" placeholder="US"
+            (keyup.enter)="search()">
+        </div>
+        <div class="form-group col-md-2">
+          <label>Order By</label>
+          <select [(ngModel)]="searchObj.order_by" name="order_by" class="custom-select">
+            <option value="id">ID</option>
+            <option value="like_count">Like</option>
+            <option value="comment_count">Comment</option>
+            <option value="music__posts">Music Posts</option>
+            <option value="tag__views">Tag Views</option>
+            <option value="author__fans">Author Fans</option>
+            <option value="author__heart">Author Heart</option>
+          </select>
+        </div>
+        <div class="form-group col-md-2">
+          <label>Sort</label>
+          <select [(ngModel)]="searchObj.sort_by" name="sort_by"
+            class="custom-select {{validateSearch.sort_by ? 'parsley-error' : ''}}"
+            (keyup)="validateSearch.sort_by = false">
+            <option value="desc">DESC</option>
+            <option value="asc">ASC</option>
+          </select>
+        </div>
+        <div class="form-group col-md-2">
+          <label>&nbsp;</label>
+          <button class="btn btn-primary btn-block" (click)="search()">Search</button>
+        </div>
+      </div>
+    </div><!-- filemgr-content-header -->
     <div class="filemgr-content-body" data-spy="scroll" data-target="#navBar">
       <div id="loading" #loading *ngIf="searchResults == null">
         <div class="spinner-grow" role="status">
@@ -24,14 +64,16 @@
       <div class="pd-20 pd-lg-25 pd-xl-30" *ngIf="searchResults != null" id="searchClip">
         <div data-label="Search Results" class="df-example">
           <div class="row row-xs" *ngIf="!noData">
-            <div class="col-2 item-video" *ngFor="let item of searchResults?.results"
+            <div *ngFor="let item of searchResults?.results"
+              class="col-2 item-video {{listIdVideo.indexOf(item.id) != -1 ? 'muted' : ''}}"
               (mouseenter)="previewVideo(item.id, false)">
               <div class="card card-file" (mouseenter)="showAction(item.id)" (mouseleave)="hideAction()">
                 <div class="card-file-thumb tx-danger">
                   <button class="btn btn-xs btn-success action-btn" (click)="addVideoToList(item)"
-                    *ngIf="actionDisplay == item.id">+</button>
-                  <img [src]="item.thumbnail_url" class="img-srs" *ngIf="actionDisplay != item.id">
-                  <video #prv *ngIf="actionDisplay == item.id"
+                    *ngIf="actionDisplay == item.id && listIdVideo.indexOf(item.id) == -1">+</button>
+                  <img [src]="item.thumbnail_url" class="img-srs"
+                    *ngIf="actionDisplay != item.id || listIdVideo.indexOf(item.id) != -1">
+                  <video #prv *ngIf="actionDisplay == item.id && listIdVideo.indexOf(item.id) == -1"
                     class="wd-100p img-fit-cover img-object-top rounded-left img-srs" autoplay
                     poster="../../assets/imgs/abc.gif" crossorigin="anonymous" style="object-fit: contain;">
                     <source [src]="dataSelected?.video_link" type="video/mp4">
@@ -62,10 +104,12 @@
 
       <div class="pd-20 pd-lg-25 pd-xl-30" *ngIf="dataVideo.list_video.length > 0" id="chooseClip">
         <div data-label="Choose Results" class="df-example">
-          <div class="row row-xs example-boundary" cdkDropList cdkDropListOrientation="horizontal"
-            (cdkDropListDropped)="dropChooseResult($event)">
-            <div class="col-2 item-video example-box" *ngFor="let item of dataVideo.list_video"
-              cdkDragBoundary=".example-boundary" cdkDrag>
+          <span>Selected: <strong>{{dataVideo.list_video.length}}</strong> clips, estimate duration:
+            <strong>{{gettime(dataVideo.list_video.length * 10)}}s</strong></span>
+          <div class="row row-xs mg-t-10 result-boundary" cdkDropList (cdkDropListDropped)="dropChooseResult($event)"
+            cdkDropListOrientation="horizontal">
+            <section class="col-2 item-video example-box" *ngFor="let item of dataVideo.list_video" cdkDrag
+              cdkDragBoundary=".result-boundary">
               <div class="card card-file" (mouseenter)="showActionRemove(item.id)" (mouseleave)="hideActionRemove()">
                 <div class="card-file-thumb tx-danger">
                   <div class="action-btn" *ngIf="actionRemove == item.id || chooseThumbnail">
@@ -80,7 +124,7 @@
                   <span>{{item.region}}</span>
                 </div>
               </div>
-            </div><!-- col -->
+            </section><!-- col -->
           </div>
         </div>
       </div>
@@ -89,7 +133,7 @@
         <div data-label="Thumbnail Style" class="df-example">
           <div class="row thumb-style">
             <div class="col-2" *ngFor="let item of listThumbnailStyle">
-              <img [src]="item.image" style="cursor: pointer;"
+              <img [src]="item?.image" style="cursor: pointer;"
                 class="{{styleSelected == item.id ? 'active-thumbnail' : ''}} img-thumbnail" [alt]="item.name"
                 (click)="chooseStyleThumbnail(item)">
             </div>
@@ -97,7 +141,8 @@
 
           <div class="row mt-3 df-example thumb-style example-boundary" *ngIf="styleSelected != null" cdkDropList
             cdkDropListOrientation="horizontal" (cdkDropListDropped)="dropThumbnail($event)">
-            <figure class="pos-relative mg-b-0 col-2 example-box" *ngFor="let item of dataVideo.thumb_style.thumb_arr;"
+            <figure class="pos-relative mg-b-0 col-2 example-box"
+              *ngFor="let item of dataVideo.thumb_style.thumb_arr | slice:0:dataVideo.thumb_style.style.group"
               cdkDragBoundary=".example-boundary" cdkDrag>
               <img [src]="item.image" class="img-fit-cover">
               <figcaption class="pos-absolute b-0 l-0 wd-100p pd-20 d-flex justify-content-center">
@@ -192,63 +237,6 @@
             </div>
           </div><!-- col -->
         </div><!-- row -->
-      </div><!-- modal-body -->
-    </div><!-- modal-content -->
-  </div><!-- modal-dialog -->
-</div><!-- modal -->
-
-<a href="#modalSearch" data-toggle="modal" class="d-none" #openSearch></a>
-<div class="modal show" id="modalSearch" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-  <div class="modal-dialog modal-dialog-centered wd-sm-400" role="document">
-    <div class="modal-content">
-      <div class="modal-body pd-20 pd-sm-40">
-        <a href="javascript:void(0)" role="button" #closeSearch class="close pos-absolute t-15 r-15 d-none"
-          data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </a>
-
-        <div class="form-row">
-          <h4>Search Clip</h4>
-          <div class="form-group col-md-12">
-            <label>Keyword <span class="tx-danger">*</span></label>
-            <input type="text" class="form-control {{validateSearch.keyword ? 'parsley-error' : ''}}"
-              [(ngModel)]="searchObj.keyword" name="keyword" placeholder="halloween"
-              (keyup)="validateSearch.keyword = false" (keyup.enter)="search()">
-            <ul class="parsley-errors-list filled" *ngIf="validateSearch.keyword">
-              <li class="parsley-required">This value is required.</li>
-            </ul>
-          </div>
-          <div class="form-row">
-            <div class="form-group col-md-3">
-              <label>Limit <span class="tx-danger">*</span></label>
-              <input type="number" [(ngModel)]="searchObj.limit" name="limit"
-                class="form-control {{validateSearch.limit ? 'parsley-error' : ''}}" placeholder="30"
-                (keyup)="validateSearch.limit = false" (keyup.enter)="search()">
-            </div>
-            <div class="form-group col-md-3">
-              <label>Region <span class="tx-danger">*</span></label>
-              <input type="text" [(ngModel)]="searchObj.region" name="region"
-                class="form-control {{validateSearch.region ? 'parsley-error' : ''}}" placeholder="US"
-                (keyup)="validateSearch.region = false" (keyup.enter)="search()">
-            </div>
-            <div class="form-group col-md-3">
-              <label>Order By <span class="tx-danger">*</span></label>
-              <input type="text" [(ngModel)]="searchObj.order_by" name="order_by"
-                class="form-control {{validateSearch.order_by ? 'parsley-error' : ''}}" placeholder="id"
-                (keyup)="validateSearch.order_by = false" (keyup.enter)="search()">
-            </div>
-            <div class="form-group col-md-3">
-              <label>Sort By <span class="tx-danger">*</span></label>
-              <select [(ngModel)]="searchObj.sort_by" name="sort_by"
-                class="custom-select {{validateSearch.sort_by ? 'parsley-error' : ''}}"
-                (keyup)="validateSearch.sort_by = false">
-                <option value="desc">DESC</option>
-                <option value="asc">ASC</option>
-              </select>
-            </div>
-          </div>
-          <button class="btn btn-primary btn-block" (click)="search()">Search</button>
-        </div>
       </div><!-- modal-body -->
     </div><!-- modal-content -->
   </div><!-- modal-dialog -->

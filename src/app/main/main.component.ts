@@ -3,7 +3,7 @@ import axios from 'axios';
 import { environment } from '../../environments/environment';
 import { registerLocaleData } from '@angular/common';
 import vi from '@angular/common/locales/vi';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-main',
@@ -38,6 +38,8 @@ export class MainComponent implements OnInit {
       thumb_arr: []
     },
   }
+
+  listIdVideo: any = [];
 
   validateFormData: any = {
     title: false,
@@ -77,12 +79,16 @@ export class MainComponent implements OnInit {
 
   addVideoToList(item: any) {
     this.dataVideo.list_video.push(item);
+    this.listIdVideo.push(item.id);
     this.resetViewVideo();
   }
 
   removeVideoFromList(item: any) {
     this.dataVideo.list_video = this.dataVideo.list_video.filter((video: { id: any; }) => {
       return video.id != item.id;
+    });
+    this.listIdVideo = this.listIdVideo.filter((id) => {
+      return id != item.id;
     });
   }
 
@@ -162,7 +168,7 @@ export class MainComponent implements OnInit {
   getData(objSearch, page) {
     const that = this;
     that.keyword = objSearch.keyword;
-    axios.get(environment.getByKeyword(objSearch.limit, objSearch.region, objSearch.order_by, objSearch.sort_by, objSearch.keyword, page), {
+    axios.get(environment.getByKeyword(objSearch.region, objSearch.order_by, objSearch.sort_by, objSearch.keyword, page), {
       headers: {
         Authorization: 'Token 9b0c3ce80d34e89d40cbc9f3b30eeb2147c98eea'
       }
@@ -207,59 +213,39 @@ export class MainComponent implements OnInit {
     setTimeout(() => {
       this.dataSelected = null;
       this.openModal = false;
-      this.chooseThumbnail = false;
     }, 100);
   }
 
   styleSelected: any = null;
-  style_3: any = [];
-  style_5: any = [];
 
   chooseStyleThumbnail(item: { id: any; group: number; }) {
     this.styleSelected = item.id;
     this.dataVideo.thumb_style.style = item;
-    switch (item.group) {
-      case 3:
-        if (this.dataVideo.thumb_style.thumb_arr.length != 0 && this.style_3.length != 0) {
-          this.dataVideo.thumb_style.thumb_arr = this.style_3;
-        } else {
-          for (let i = 1; i <= item.group; i++) {
-            let obj = {
-              id: i,
-              image: "/assets/imgs/default_thumbnail.jpg"
-            }
-            this.style_3.push(obj);
-            if (i == item.group) {
-              this.dataVideo.thumb_style.thumb_arr = this.style_3;
+
+    if (this.dataVideo.thumb_style.thumb_arr.length == 0) {
+      for (let i = 1; i <= 5; i++) {
+        let obj = {
+          id: i,
+          image: "/assets/imgs/default_thumbnail.jpg"
+        }
+        this.dataVideo.thumb_style.thumb_arr.push(obj);
+      }
+    } else {
+      if (item.group == 5) return;
+      for (let j = 3; j < this.dataVideo.thumb_style.thumb_arr.length; j++) {
+        const el = this.dataVideo.thumb_style.thumb_arr[j];
+        if (el == undefined) return;
+        if (el.image.indexOf(";base64,") != -1) {
+          for (let k = 0; k < 3; k++) {
+            const _el = this.dataVideo.thumb_style.thumb_arr[k];
+            if (_el == undefined) return;
+            if (_el.image.indexOf(";base64,") == -1) {
+              _el.image = el.image;
+              el.image = "/assets/imgs/default_thumbnail.jpg";
             }
           }
         }
-        break;
-      case 5:
-        if (this.dataVideo.thumb_style.thumb_arr.length != 0 && this.style_5.length != 0) {
-          this.dataVideo.thumb_style.thumb_arr = this.style_5;
-        } else {
-          for (let i = 1; i <= item.group; i++) {
-            let obj = {
-              id: i,
-              image: "/assets/imgs/default_thumbnail.jpg"
-            }
-            this.style_5.push(obj);
-            if (i == item.group) {
-              if (this.style_3.length != 0) {
-                this.style_3.forEach((item, index) => {
-                  if (item.image.indexOf(";base64,") != -1) {
-                    this.style_5[index].image = item.image;
-                  }
-                });
-              }
-              this.dataVideo.thumb_style.thumb_arr = this.style_5;
-            }
-          }
-        }
-        break;
-      default:
-        break;
+      }
     }
   }
 
@@ -271,22 +257,15 @@ export class MainComponent implements OnInit {
     this.chooseThumbnail = true;
   }
 
-  @ViewChild('openSearch') openSearch: ElementRef;
-  @ViewChild('closeSearch') closeSearch: ElementRef;
-
   searchObj: any = {
     keyword: null,
-    limit: 30,
     region: null,
-    order_by: null,
+    order_by: 'id',
     sort_by: 'desc'
   }
 
   validateSearch: any = {
-    keyword: false,
-    limit: false,
-    region: false,
-    order_by: false
+    keyword: false
   }
 
   validateSearchFunc() {
@@ -297,38 +276,18 @@ export class MainComponent implements OnInit {
     } else {
       this.validateSearch.keyword = false;
     }
-    if (this.searchObj.limit == null) {
-      this.validateSearch.limit = true;
-      x = false;
-    } else {
-      this.validateSearch.limit = false;
-    }
-    if (this.searchObj.region == null) {
-      this.validateSearch.region = true;
-      x = false;
-    } else {
-      this.validateSearch.region = false;
-    }
-    if (this.searchObj.order_by == null) {
-      this.validateSearch.order_by = true;
-      x = false;
-    } else {
-      this.validateSearch.order_by = false;
-    }
     return x;
   }
 
   search() {
     if (this.validateSearchFunc()) {
       this.getData(this.searchObj, 1);
-      this.closeSearch.nativeElement.click();
     }
   }
 
   ngOnInit() {
     this.listThumbnailStyle = environment.listStyle;
     registerLocaleData(vi);
-    this.openSearch.nativeElement.click();
   }
 
   dropChooseResult(event: CdkDragDrop<any[]>) {
@@ -339,6 +298,13 @@ export class MainComponent implements OnInit {
     moveItemInArray(this.dataVideo.thumb_style.thumb_arr, event.previousIndex, event.currentIndex);
   }
 
+  gettime(StrTime: number) {
+    var mins = Math.floor(StrTime / 60);
+    var secs = StrTime - mins * 60;
+    var hrs = Math.floor(StrTime / 3600);
+    return (hrs > 9 ? hrs : "0" + hrs) + ":" + (mins > 9 ? mins : "0" + mins) + ":" + (secs > 9 ? secs : "0" + secs);
+  }
+
   public async capture() {
     this.canvas.nativeElement.width = this.video.nativeElement.videoWidth;
     this.canvas.nativeElement.height = this.video.nativeElement.videoHeight;
@@ -347,6 +313,9 @@ export class MainComponent implements OnInit {
       if (item.id == this.idThumbnailSelect) {
         item.image = this.canvas.nativeElement.toDataURL("image/png");
         this.resetViewVideo();
+        setTimeout(() => {
+          this.chooseThumbnail = false;
+        }, 100);
       }
     });
   }
