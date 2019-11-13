@@ -159,7 +159,7 @@ export class MainComponent implements OnInit {
   currentPage: any = 1;
   noData: boolean = false;
 
-  getData(objSearch: { keyword: any; limit: any; region: any; order_by: any; sort_by: any; tags: any; }, page: number) {
+  getData(objSearch, page) {
     const that = this;
     that.keyword = objSearch.keyword;
     axios.get(environment.getByKeyword(objSearch.limit, objSearch.region, objSearch.order_by, objSearch.sort_by, objSearch.keyword, page), {
