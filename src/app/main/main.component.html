@@ -15,17 +15,15 @@
   </div><!-- filemgr-sidebar -->
 
   <div class="filemgr-content">
-    <div class="filemgr-content-header">
-      <i data-feather="search"></i>
-      <div class="search-form">
-        <input type="search" class="form-control" placeholder="Search keyword here" #keyword
-          (keyup.enter)="getVideoByKeyword(keyword.value)" value="makeup">
-      </div><!-- search-form -->
-    </div><!-- filemgr-content-header -->
     <div class="filemgr-content-body" data-spy="scroll" data-target="#navBar">
+      <div id="loading" #loading *ngIf="searchResults == null">
+        <div class="spinner-grow" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
       <div class="pd-20 pd-lg-25 pd-xl-30" *ngIf="searchResults != null" id="searchClip">
         <div data-label="Search Results" class="df-example">
-          <div class="row row-xs">
+          <div class="row row-xs" *ngIf="!noData">
             <div class="col-2 item-video" *ngFor="let item of searchResults?.results"
               (mouseenter)="previewVideo(item.id, false)">
               <div class="card card-file" (mouseenter)="showAction(item.id)" (mouseleave)="hideAction()">
@@ -56,6 +54,9 @@
                   href="javascript:void(0)" (click)="changePageSearchResult(item)">{{item}}</a></li>
             </ul>
           </nav>
+          <div class="row row-xs" *ngIf="noData">
+            No data
+          </div>
         </div>
       </div>
 
@@ -112,7 +113,7 @@
       <div class="pd-20 pd-lg-25 pd-xl-30" *ngIf="styleSelected != null" id="videoInfomation">
         <div data-label="Video Infomation" class="df-example demo-forms">
           <div class="form-group">
-            <label class="d-block">Title<span class="tx-danger">*</span></label>
+            <label class="d-block">Title <span class="tx-danger">*</span></label>
             <input type="text" name="title" [(ngModel)]="dataVideo.title"
               class="form-control {{validateFormData.title ? 'parsley-error' : ''}}" placeholder="Title"
               (keyup)="validateFormData.title = false">
@@ -121,7 +122,7 @@
             </ul>
           </div>
           <div class="form-group">
-            <label class="d-block">Description<span class="tx-danger">*</span></label>
+            <label class="d-block">Description <span class="tx-danger">*</span></label>
             <textarea name="description" [(ngModel)]="dataVideo.description"
               class="form-control {{validateFormData.description ? 'parsley-error' : ''}}" id="description" cols="30"
               rows="10" (keyup)="validateFormData.description = false"></textarea>
@@ -130,7 +131,7 @@
             </ul>
           </div>
           <div class="form-group">
-            <label class="d-block">Tag (separated by commas)<span class="tx-danger">*</span></label>
+            <label class="d-block">Tag (separated by commas) <span class="tx-danger">*</span></label>
             <input type="text" name="tags" [(ngModel)]="dataVideo.tags"
               class="form-control {{validateFormData.tags ? 'parsley-error' : ''}}"
               placeholder="halloween, ghost, ...etc" (keyup)="validateFormData.tags = false">
@@ -191,6 +192,63 @@
             </div>
           </div><!-- col -->
         </div><!-- row -->
+      </div><!-- modal-body -->
+    </div><!-- modal-content -->
+  </div><!-- modal-dialog -->
+</div><!-- modal -->
+
+<a href="#modalSearch" data-toggle="modal" class="d-none" #openSearch></a>
+<div class="modal show" id="modalSearch" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered wd-sm-400" role="document">
+    <div class="modal-content">
+      <div class="modal-body pd-20 pd-sm-40">
+        <a href="javascript:void(0)" role="button" #closeSearch class="close pos-absolute t-15 r-15 d-none"
+          data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </a>
+
+        <div class="form-row">
+          <h4>Search Clip</h4>
+          <div class="form-group col-md-12">
+            <label>Keyword <span class="tx-danger">*</span></label>
+            <input type="text" class="form-control {{validateSearch.keyword ? 'parsley-error' : ''}}"
+              [(ngModel)]="searchObj.keyword" name="keyword" placeholder="halloween"
+              (keyup)="validateSearch.keyword = false" (keyup.enter)="search()">
+            <ul class="parsley-errors-list filled" *ngIf="validateSearch.keyword">
+              <li class="parsley-required">This value is required.</li>
+            </ul>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-3">
+              <label>Limit <span class="tx-danger">*</span></label>
+              <input type="number" [(ngModel)]="searchObj.limit" name="limit"
+                class="form-control {{validateSearch.limit ? 'parsley-error' : ''}}" placeholder="30"
+                (keyup)="validateSearch.limit = false" (keyup.enter)="search()">
+            </div>
+            <div class="form-group col-md-3">
+              <label>Region <span class="tx-danger">*</span></label>
+              <input type="text" [(ngModel)]="searchObj.region" name="region"
+                class="form-control {{validateSearch.region ? 'parsley-error' : ''}}" placeholder="US"
+                (keyup)="validateSearch.region = false" (keyup.enter)="search()">
+            </div>
+            <div class="form-group col-md-3">
+              <label>Order By <span class="tx-danger">*</span></label>
+              <input type="text" [(ngModel)]="searchObj.order_by" name="order_by"
+                class="form-control {{validateSearch.order_by ? 'parsley-error' : ''}}" placeholder="id"
+                (keyup)="validateSearch.order_by = false" (keyup.enter)="search()">
+            </div>
+            <div class="form-group col-md-3">
+              <label>Sort By <span class="tx-danger">*</span></label>
+              <select [(ngModel)]="searchObj.sort_by" name="sort_by"
+                class="custom-select {{validateSearch.sort_by ? 'parsley-error' : ''}}"
+                (keyup)="validateSearch.sort_by = false">
+                <option value="desc">DESC</option>
+                <option value="asc">ASC</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-primary btn-block" (click)="search()">Search</button>
+        </div>
       </div><!-- modal-body -->
     </div><!-- modal-content -->
   </div><!-- modal-dialog -->

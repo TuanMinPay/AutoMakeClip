@@ -157,34 +157,29 @@ export class MainComponent implements OnInit {
 
   keyword: any = null;
   currentPage: any = 1;
+  noData: boolean = false;
 
-  getData(keyword: { trim: () => string; }, page: number) {
+  getData(objSearch: { keyword: any; limit: any; region: any; order_by: any; sort_by: any; tags: any; }, page: number) {
     const that = this;
-    that.keyword = keyword;
-    axios.get(`${environment.getByKeyword}&tags_name=${keyword}&page=${page}`, {
+    that.keyword = objSearch.keyword;
+    axios.get(environment.getByKeyword(objSearch.limit, objSearch.region, objSearch.order_by, objSearch.sort_by, objSearch.keyword, page), {
       headers: {
         Authorization: 'Token 9b0c3ce80d34e89d40cbc9f3b30eeb2147c98eea'
       }
     }).then(function (response) {
-      // handle success
+      response.data.results.length == 0 ? that.noData = true : that.noData = false;
       that.searchResults = response.data;
-
       that.pageControl = that.getPager(response.data.count, page);
       that.currentPage = page;
     }).catch(function (error) {
-      // handle error
+      that.noData = true;
       console.log(error);
     });
   }
 
   changePageSearchResult(page) {
     if (this.currentPage == page) return;
-    this.getData(this.keyword, page);
-  }
-
-  getVideoByKeyword(keyword: { trim: () => string; }) {
-    if (keyword.trim() == '') return;
-    this.getData(keyword, 1);
+    this.getData(this.searchObj, page);
   }
 
   getItemVideo(id: any) {
@@ -276,9 +271,64 @@ export class MainComponent implements OnInit {
     this.chooseThumbnail = true;
   }
 
+  @ViewChild('openSearch') openSearch: ElementRef;
+  @ViewChild('closeSearch') closeSearch: ElementRef;
+
+  searchObj: any = {
+    keyword: null,
+    limit: 30,
+    region: null,
+    order_by: null,
+    sort_by: 'desc'
+  }
+
+  validateSearch: any = {
+    keyword: false,
+    limit: false,
+    region: false,
+    order_by: false
+  }
+
+  validateSearchFunc() {
+    var x = true;
+    if (this.searchObj.keyword == null) {
+      this.validateSearch.keyword = true;
+      x = false;
+    } else {
+      this.validateSearch.keyword = false;
+    }
+    if (this.searchObj.limit == null) {
+      this.validateSearch.limit = true;
+      x = false;
+    } else {
+      this.validateSearch.limit = false;
+    }
+    if (this.searchObj.region == null) {
+      this.validateSearch.region = true;
+      x = false;
+    } else {
+      this.validateSearch.region = false;
+    }
+    if (this.searchObj.order_by == null) {
+      this.validateSearch.order_by = true;
+      x = false;
+    } else {
+      this.validateSearch.order_by = false;
+    }
+    return x;
+  }
+
+  search() {
+    if (this.validateSearchFunc()) {
+      this.getData(this.searchObj, 1);
+      this.closeSearch.nativeElement.click();
+    }
+  }
+
   ngOnInit() {
     this.listThumbnailStyle = environment.listStyle;
     registerLocaleData(vi);
+    this.openSearch.nativeElement.click();
   }
 
   dropChooseResult(event: CdkDragDrop<any[]>) {
