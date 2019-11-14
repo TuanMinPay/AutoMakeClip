@@ -106,10 +106,8 @@
         <div data-label="Choose Results" class="df-example">
           <span>Selected: <strong>{{dataVideo.list_video.length}}</strong> clips, estimate duration:
             <strong>{{gettime(dataVideo.list_video.length * 10)}}s</strong></span>
-          <div class="row row-xs mg-t-10 result-boundary" cdkDropList (cdkDropListDropped)="dropChooseResult($event)"
-            cdkDropListOrientation="horizontal">
-            <section class="col-2 item-video example-box" *ngFor="let item of dataVideo.list_video" cdkDrag
-              cdkDragBoundary=".result-boundary">
+          <div class="row row-xs mg-t-10 result-boundary" dragula="LIST_VIDEO" [(dragulaModel)]="dataVideo.list_video">
+            <div class="col-2 item-video example-box" *ngFor="let item of dataVideo.list_video">
               <div class="card card-file" (mouseenter)="showActionRemove(item.id)" (mouseleave)="hideActionRemove()">
                 <div class="card-file-thumb tx-danger">
                   <div class="action-btn" *ngIf="actionRemove == item.id || chooseThumbnail">
@@ -124,7 +122,7 @@
                   <span>{{item.region}}</span>
                 </div>
               </div>
-            </section><!-- col -->
+            </div><!-- col -->
           </div>
         </div>
       </div>

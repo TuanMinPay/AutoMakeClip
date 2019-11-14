@@ -4,6 +4,7 @@ import { environment } from '../../environments/environment';
 import { registerLocaleData } from '@angular/common';
 import vi from '@angular/common/locales/vi';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { DragulaService } from 'ng2-dragula';
 
 @Component({
   selector: 'app-main',
@@ -18,7 +19,9 @@ export class MainComponent implements OnInit {
   @ViewChild("canvas")
   public canvas: ElementRef;
 
-  constructor() {
+  constructor(
+    private dragulaService: DragulaService
+  ) {
   }
 
   searchResults: any = null;
@@ -288,12 +291,9 @@ export class MainComponent implements OnInit {
   ngOnInit() {
     this.listThumbnailStyle = environment.listStyle;
     registerLocaleData(vi);
+    this.dragulaService.createGroup('LIST_VIDEO', {});
   }
-
-  dropChooseResult(event: CdkDragDrop<any[]>) {
-    moveItemInArray(this.dataVideo.list_video, event.previousIndex, event.currentIndex);
-  }
-
+  
   dropThumbnail(event: CdkDragDrop<any[]>) {
     moveItemInArray(this.dataVideo.thumb_style.thumb_arr, event.previousIndex, event.currentIndex);
   }

@@ -10,6 +10,7 @@ import { NgtUniversalModule } from '@ng-toolkit/universal';
 import { MainComponent } from './main/main.component';
 import { FormsModule } from '@angular/forms';
 import { DragDropModule } from '@angular/cdk/drag-drop';
+import { DragulaModule } from 'ng2-dragula';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
     HttpClientModule,
     NgtUniversalModule,
     FormsModule,
-    DragDropModule
+    DragDropModule,
+    DragulaModule.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent]
