@@ -171,11 +171,7 @@ export class MainComponent implements OnInit {
   getData(objSearch, page) {
     const that = this;
     that.keyword = objSearch.keyword;
-    axios.get(environment.getByKeyword(objSearch.region, objSearch.order_by, objSearch.sort_by, objSearch.keyword, page), {
-      headers: {
-        Authorization: 'Token 9b0c3ce80d34e89d40cbc9f3b30eeb2147c98eea'
-      }
-    }).then(function (response) {
+    axios.get(environment.getByKeyword(objSearch.region, objSearch.order_by, objSearch.sort_by, objSearch.keyword, page)).then(function (response) {
       response.data.results.length == 0 ? that.noData = true : that.noData = false;
       that.searchResults = response.data;
       that.pageControl = that.getPager(response.data.count, page);
@@ -293,7 +289,7 @@ export class MainComponent implements OnInit {
     registerLocaleData(vi);
     this.dragulaService.createGroup('LIST_VIDEO', {});
   }
-  
+
   dropThumbnail(event: CdkDragDrop<any[]>) {
     moveItemInArray(this.dataVideo.thumb_style.thumb_arr, event.previousIndex, event.currentIndex);
   }
