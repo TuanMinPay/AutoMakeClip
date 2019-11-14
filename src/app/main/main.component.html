@@ -91,9 +91,14 @@
           </div>
           <nav aria-label="Pagination search results">
             <ul class="pagination mg-b-0 mg-t-20">
+              <li class="page-item"><a class="page-link" href="javascript:void(0)" (click)="changePageSearchResult(1)"
+                  *ngIf="pageControl?.currentPage != 1">First</a></li>
               <li *ngFor="let item of pageControl?.pages"
                 class="page-item {{(pageControl?.currentPage == item) ? 'active' : ''}}"><a class="page-link"
                   href="javascript:void(0)" (click)="changePageSearchResult(item)">{{item}}</a></li>
+              <li class="page-item"><a class="page-link" href="javascript:void(0)"
+                  (click)="changePageSearchResult(pageControl?.totalPages)"
+                  *ngIf="pageControl?.currentPage != pageControl?.totalPages">Last</a></li>
             </ul>
           </nav>
           <div class="row row-xs" *ngIf="noData">
