@@ -46,20 +46,6 @@ enableProdMode();
 // Express server
 export const app = express();
 
-app.get('/api/v1/video', (req, res) => {
-  axios.get(`${process.env.API_V1}${req.url}`, {
-    headers: {
-      Authorization: `"${process.env.TOKEN}"`
-    }
-  }).then(function (response) {
-    res.status(response.status).send(response);
-  }).catch(function (error) {
-    console.log("Abc", error);
-
-    res.status(401).send(error);
-  });
-});
-
 // * NOTE :: leave this as require() since this file is built Dynamically from webpack
 const { AppServerModuleNgFactory, LAZY_MODULE_MAP } = require('./dist/server/main');
 
