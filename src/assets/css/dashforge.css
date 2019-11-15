@@ -12714,9 +12714,6 @@ textarea.parsley-success:focus {
       .navbar-header .navbar-right {
         order: 3;
         padding: 0 20px 0 0; } }
-    @media (min-width: 1200px) {
-      .navbar-header .navbar-right {
-        width: 240px; } }
     .navbar-header .navbar-right .search-link {
       color: #001737; }
       .navbar-header .navbar-right .search-link:hover, .navbar-header .navbar-right .search-link:focus {

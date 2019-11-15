@@ -4,10 +4,13 @@
 
 export const environment = {
   production: false,
+  api_v1: 'http://xx.xx.xx.xx:xxxx',
   getByKeyword(region: any, order_by: any, order_type: any, tags: any, page: any) {
-    return `http://54.37.84.131:8088/api/v1/video/?order_type=${order_type}&tags_name=${tags}&page=${page}${(region != null) ? `&region=${region}` : ''}${(order_by != null) ? `&order_by=${order_by}` : ''}`
+    return `${this.api_v1}/api/v1/video/?order_type=${order_type}&tags_name=${tags}&page=${page}${(region != null) ? `&region=${region}` : ''}${(order_by != null) ? `&order_by=${order_by}` : ''}`
   },
-  uploadImage: 'http://54.37.84.131:8088/api/v1/upload/',
+  uploadImage: `${this.api_v1}/api/v1/upload/`,
+  saveApi: `${this.api_v1}/api/v1/make/`,
+  youtubeChannelInfo(id: any) { return `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=${id}&key=AIzaSyBE4o11lhLuqOLwk6-OBUPPFBmZ1jGps9E` },
   listStyle: [{
     id: 1,
     group: 3,

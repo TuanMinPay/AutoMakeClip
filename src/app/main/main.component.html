@@ -110,7 +110,7 @@
         </div>
       </div>
 
-      <div class="pd-20 pd-lg-25 pd-xl-30" *ngIf="dataVideo.list_video.length > 0" id="chooseClip">
+      <div class="pd-20 pd-lg-25 pd-xl-30" *ngIf="dataVideo.list_video.length > 0" id="chooseClip" #chooseClip>
         <div data-label="Choose Results" class="df-example">
           <span>Selected: <strong>{{dataVideo.list_video.length}}</strong> clips, estimate duration:
             <strong>{{gettime(dataVideo.list_video.length * 10)}}s</strong></span>
@@ -154,7 +154,8 @@
               <img [src]="item.image" class="img-fit-cover">
               <figcaption class="pos-absolute b-0 l-0 wd-100p pd-20 d-flex justify-content-center">
                 <div class="btn-group">
-                  <a href="#chooseClip" class="btn btn-primary btn-icon" (click)="editThumbnail(item.id)">Edit</a>
+                  <a href="javascript:void(0)" class="btn btn-primary btn-icon"
+                    (click)="editThumbnail(item.id)">Edit</a>
                 </div>
               </figcaption>
             </figure>
@@ -181,9 +182,11 @@
         </div>
       </div>
 
-      <div class="pd-20 pd-lg-25 pd-xl-30" id="saveVideo" *ngIf="styleSelected != null">
+      <div class="pd-20 pd-lg-25 pd-xl-30" id="saveVideo" style="display: inline-flex;" *ngIf="styleSelected != null">
         <button type="button" class="btn btn-success" (click)="save()">Save</button>
-        <button type="button" class="btn btn-danger mg-l-10">Reset All</button>
+        <div class="spinner-border mg-l-10" role="status" *ngIf="loadingSave">
+          <span class="sr-only">Loading...</span>
+        </div>
       </div>
 
     </div><!-- filemgr-content-body -->

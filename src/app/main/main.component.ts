@@ -1,10 +1,13 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter } from '@angular/core';
 import axios from 'axios';
 import { environment } from '../../environments/environment';
 import { registerLocaleData } from '@angular/common';
 import vi from '@angular/common/locales/vi';
-import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { DragulaService } from 'ng2-dragula';
+import { ActivatedRoute } from '@angular/router';
+import { DataService } from '../services/data.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-main',
@@ -20,7 +23,9 @@ export class MainComponent implements OnInit {
   public canvas: ElementRef;
 
   constructor(
-    private dragulaService: DragulaService
+    private dragulaService: DragulaService,
+    private route: ActivatedRoute,
+    private data: DataService
   ) {
   }
 
@@ -47,7 +52,12 @@ export class MainComponent implements OnInit {
   @ViewChild("thumbnail") thumbnail: ElementRef;
   thumbnailError: boolean = false;
 
+  loadingSave: boolean = false;
+
   save() {
+    const that = this;
+    if (this.loadingSave) return;
+    this.loadingSave = true;
     this.thumbnailError = false;
     if (this.dataVideo.thumb_style.style.group == 3) {
       this.dataVideo.thumb_style.thumb_arr = this.dataVideo.thumb_style.thumb_arr.slice(0, 3);
@@ -68,7 +78,25 @@ export class MainComponent implements OnInit {
         });
       }
       if (index == (this.dataVideo.thumb_style.thumb_arr.length - 1)) {
-        console.log(this.dataVideo);
+        let obj = {
+          channel_id: this.channel_id,
+          make_list: this.dataVideo
+        }
+        await axios.post(environment.saveApi, obj).then(function (response) {
+          that.loadingSave = false;
+          Swal.fire({
+            icon: 'success',
+            title: 'Save video successfully'
+          });
+        }).catch(function (error) {
+          that.loadingSave = false;
+          Swal.fire({
+            icon: 'error',
+            title: 'Someting went wrong',
+            text: 'Oops...'
+          });
+          console.log(error);
+        });
       }
     });
 
@@ -251,10 +279,13 @@ export class MainComponent implements OnInit {
   chooseThumbnail: boolean = false;
   idThumbnailSelect: any = null;
 
+  @ViewChild('chooseClip') chooseClip: ElementRef;
+
   editThumbnail(id) {
     this.idThumbnailSelect = id;
     this.chooseThumbnail = true;
     this.thumbnailError = false;
+    this.chooseClip.nativeElement.scrollIntoView();
   }
 
   searchObj: any = {
@@ -285,7 +316,27 @@ export class MainComponent implements OnInit {
     }
   }
 
+  channel_id: string = null;
+  channel_info: any;
+  @Output() messageEvent = new EventEmitter<string>();
+
   ngOnInit() {
+    const that = this;
+    this.channel_id = this.route.snapshot.queryParamMap.get('channel_id');
+    if (this.channel_id == null) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Channel id is null',
+        text: 'Oops...'
+      });
+    } else {
+      axios.get(environment.youtubeChannelInfo(this.channel_id)).then(function (response) {
+        that.channel_info = response.data;
+        that.data.changeMessage(that.channel_info);
+      }).catch(function (error) {
+        console.log(error);
+      });
+    }
     this.listThumbnailStyle = environment.listStyle;
     registerLocaleData(vi);
     this.dragulaService.createGroup('LIST_VIDEO', {});

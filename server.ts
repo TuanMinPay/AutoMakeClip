@@ -93,7 +93,19 @@ app.post('/api/v1/upload', async (req, res) => {
   }).catch(function (error) {
     res.status(error.status).send(error.data);
   });
-})
+});
+
+app.post('/api/v1/make', async (req, res) => {
+  await axios.post(`${process.env.API_V1}${req.originalUrl.toString()}`, req.body, {
+    headers: {
+      Authorization: process.env.TOKEN
+    }
+  }).then(function (response) {
+    res.status(response.status).send(response.data);
+  }).catch(function (error) {
+    res.status(error.status).send(error.data);
+  });
+});
 
 // Example Express Rest API endpoints
 // app.get('/api/**', (req, res) => { });
