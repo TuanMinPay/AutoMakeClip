@@ -1,27 +1,70 @@
-# AutoMake
+# Command
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.3.8.
+clone project
+```
+git clone https://github.com/Tuannvd00538/AutoMakeClip.git automake
+```
+then
+```
+cd automake
+```
+then
 
-## Development server
+```
+npm install --save
+```
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+# then
+create file `.env`
+```
+PORT = 8080
+API_V1 = http://xx.xx.xx.xx:xxxx
+TOKEN = Token xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
 
-## Code scaffolding
+# then
+creater log
+```
+sudo pm2 ecosystem simple
+```
+and then edit file ```ecosystem.config.js```
+```
+sudo nano ecosystem.config.js
+```
+edit it into
+```
+module.exports = {
+  apps : [{
+    name   : "AutoFarm",
+    script : "./local.js",
+    log_date_format : "YYYY-MM-DD HH:mm Z",
+    error_file : "./logs/error_log/error_log_autofarm.log",
+    out_file : "./logs/out_log/out_log_autofarm.log"
+  }]
+}
+```
+then ```Ctrl + X``` and then ```Ctrl + Y``` to save edit
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+install ```logrotate```
+```
+sudo pm2 install pm2-logrotate
+```
 
-## Build
+config ```logrotate```
+```
+sudo pm2 set pm2-logrotate:retain 7
+sudo pm2 set pm2-logrotate:compress false
+sudo pm2 set pm2-logrotate:dateFormat YYYY-MM-DD_HH-mm-ss
+sudo pm2 set pm2-logrotate:max_size 128M
+sudo pm2 set pm2-logrotate:rotateInterval '0 0 * * * '
+sudo pm2 set pm2-logrotate:rotateModule true
+sudo pm2 set pm2-logrotate:workerInterval 30
+```
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+```
+npm run build:prod
+```
 
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+```
+sudo pm2 start ecosystem.config.js
+```
