@@ -89,16 +89,19 @@
               </div>
             </div><!-- col -->
           </div>
-          <nav aria-label="Pagination search results">
+          <nav aria-label="Pagination search results" *ngIf="searchResults?.count > 10">
             <ul class="pagination mg-b-0 mg-t-20">
-              <li class="page-item"><a class="page-link" href="javascript:void(0)" (click)="changePageSearchResult(1)"
-                  *ngIf="pageControl?.currentPage != 1">First</a></li>
+              <li class="page-item"><a class="page-link {{(pageControl?.currentPage == 1) ? 'muted' : ''}}"
+                  href="javascript:void(0)" (click)="changePageSearchResult(1)">First</a></li>
               <li *ngFor="let item of pageControl?.pages"
                 class="page-item {{(pageControl?.currentPage == item) ? 'active' : ''}}"><a class="page-link"
                   href="javascript:void(0)" (click)="changePageSearchResult(item)">{{item}}</a></li>
-              <li class="page-item"><a class="page-link" href="javascript:void(0)"
-                  (click)="changePageSearchResult(pageControl?.totalPages)"
-                  *ngIf="pageControl?.currentPage != pageControl?.totalPages">Last</a></li>
+              <li class="page-item {{(pageControl?.currentPage == pageControl?.totalPages) ? 'muted' : ''}}"><a
+                  class="page-link" href="javascript:void(0)"
+                  (click)="changePageSearchResult(pageControl?.totalPages)">Last</a></li>
+              <div class="spinner-border mg-l-10" role="status" *ngIf="loading">
+                <span class="sr-only">Loading...</span>
+              </div>
             </ul>
           </nav>
           <div class="row row-xs" *ngIf="noData">
@@ -132,7 +135,8 @@
         </div>
       </div>
 
-      <div class="pd-20 pd-lg-25 pd-xl-30" *ngIf="dataVideo.list_video.length > 0" id="makeThumbnail">
+      <div class="pd-20 pd-lg-25 pd-xl-30 {{thumbnailError ? 'error-image' : ''}}" #thumbnail
+        *ngIf="dataVideo.list_video.length > 0" id="makeThumbnail">
         <div data-label="Thumbnail Style" class="df-example">
           <div class="row thumb-style">
             <div class="col-2" *ngFor="let item of listThumbnailStyle">
@@ -161,31 +165,18 @@
       <div class="pd-20 pd-lg-25 pd-xl-30" *ngIf="styleSelected != null" id="videoInfomation">
         <div data-label="Video Infomation" class="df-example demo-forms">
           <div class="form-group">
-            <label class="d-block">Title <span class="tx-danger">*</span></label>
-            <input type="text" name="title" [(ngModel)]="dataVideo.title"
-              class="form-control {{validateFormData.title ? 'parsley-error' : ''}}" placeholder="Title"
-              (keyup)="validateFormData.title = false">
-            <ul class="parsley-errors-list filled" *ngIf="validateFormData.title">
-              <li class="parsley-required">This value is required.</li>
-            </ul>
+            <label class="d-block">Title</label>
+            <input type="text" name="title" [(ngModel)]="dataVideo.title" class="form-control" placeholder="Title">
           </div>
           <div class="form-group">
-            <label class="d-block">Description <span class="tx-danger">*</span></label>
-            <textarea name="description" [(ngModel)]="dataVideo.description"
-              class="form-control {{validateFormData.description ? 'parsley-error' : ''}}" id="description" cols="30"
-              rows="10" (keyup)="validateFormData.description = false"></textarea>
-            <ul class="parsley-errors-list filled" *ngIf="validateFormData.description">
-              <li class="parsley-required">This value is required.</li>
-            </ul>
+            <label class="d-block">Description</label>
+            <textarea name="description" [(ngModel)]="dataVideo.description" class="form-control" id="description"
+              cols="30"></textarea>
           </div>
           <div class="form-group">
-            <label class="d-block">Tag (separated by commas) <span class="tx-danger">*</span></label>
-            <input type="text" name="tags" [(ngModel)]="dataVideo.tags"
-              class="form-control {{validateFormData.tags ? 'parsley-error' : ''}}"
-              placeholder="halloween, ghost, ...etc" (keyup)="validateFormData.tags = false">
-            <ul class="parsley-errors-list filled" *ngIf="validateFormData.tags">
-              <li class="parsley-required">This value is required.</li>
-            </ul>
+            <label class="d-block">Tag (separated by commas)</label>
+            <input type="text" name="tags" [(ngModel)]="dataVideo.tags" class="form-control"
+              placeholder="halloween, ghost, ...etc">
           </div>
         </div>
       </div>
@@ -235,8 +226,8 @@
                 {{dataSelected.author.following | number:'':'vi'}} following</p>
               <a href="javascript:void(0)" class="btn btn-success btn-block btn-uppercase" data-dismiss="modal"
                 (click)="addVideoToList(dataSelected)" *ngIf="!chooseThumbnail">Add To List</a>
-              <a href="javascript:void(0)" class="btn btn-success btn-block btn-uppercase" (click)="capture()"
-                data-dismiss="modal" *ngIf="chooseThumbnail">Take A Picture</a>
+              <a href="javascript:void(0)" class="btn btn-success btn-block btn-uppercase"
+                (click)="capture(dataSelected.id)" data-dismiss="modal" *ngIf="chooseThumbnail">Take A Picture</a>
             </div>
           </div><!-- col -->
         </div><!-- row -->

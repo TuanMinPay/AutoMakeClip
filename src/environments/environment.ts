@@ -7,6 +7,7 @@ export const environment = {
   getByKeyword(region: any, order_by: any, order_type: any, tags: any, page: any) {
     return `http://54.37.84.131:8088/api/v1/video/?order_type=${order_type}&tags_name=${tags}&page=${page}${(region != null) ? `&region=${region}` : ''}${(order_by != null) ? `&order_by=${order_by}` : ''}`
   },
+  uploadImage: 'http://54.37.84.131:8088/api/v1/upload/',
   listStyle: [{
     id: 1,
     group: 3,

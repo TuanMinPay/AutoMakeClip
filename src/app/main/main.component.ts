@@ -44,39 +44,33 @@ export class MainComponent implements OnInit {
 
   listIdVideo: any = [];
 
-  validateFormData: any = {
-    title: false,
-    description: false,
-    tags: false
-  }
-
-  validateFunc() {
-    var x = true;
-    if (this.dataVideo.title == null) {
-      this.validateFormData.title = true;
-      x = false;
-    } else {
-      this.validateFormData.title = false;
-    }
-    if (this.dataVideo.description == null) {
-      this.validateFormData.description = true;
-      x = false;
-    } else {
-      this.validateFormData.description = false;
-    }
-    if (this.dataVideo.tags == null) {
-      this.validateFormData.tags = true;
-      x = false;
-    } else {
-      this.validateFormData.tags = false;
-    }
-    return x;
-  }
+  @ViewChild("thumbnail") thumbnail: ElementRef;
+  thumbnailError: boolean = false;
 
   save() {
-    if (this.validateFunc()) {
-      console.log(this.dataVideo);
+    this.thumbnailError = false;
+    if (this.dataVideo.thumb_style.style.group == 3) {
+      this.dataVideo.thumb_style.thumb_arr = this.dataVideo.thumb_style.thumb_arr.slice(0, 3);
     }
+    this.dataVideo.thumb_style.thumb_arr.forEach(async (item, index) => {
+      if (item.image.indexOf(";base64,") == -1 && item.image.indexOf("http://") == -1) {
+        this.thumbnail.nativeElement.scrollIntoView({ block: 'start', behavior: 'smooth', inline: 'nearest' });
+        this.thumbnailError = true;
+      } else if (item.image.indexOf(";base64,") != -1 && item.image.indexOf("http://") == -1) {
+        let obj = {
+          video: item.video_id,
+          base64_image: item.image
+        }
+        await axios.post(environment.uploadImage, obj).then(function (response) {
+          item.image = response.data.image;
+        }).catch(function (error) {
+          console.log(error);
+        });
+      }
+      if (index == (this.dataVideo.thumb_style.thumb_arr.length - 1)) {
+        console.log(this.dataVideo);
+      }
+    });
 
   }
 
@@ -167,19 +161,18 @@ export class MainComponent implements OnInit {
   keyword: any = null;
   currentPage: any = 1;
   noData: boolean = false;
+  loading: boolean = false;
 
   getData(objSearch, page) {
     const that = this;
+    that.loading = true;
     that.keyword = objSearch.keyword;
-    axios.get(environment.getByKeyword(objSearch.region, objSearch.order_by, objSearch.sort_by, objSearch.keyword, page), {
-      headers: {
-        Authorization: 'Token 9b0c3ce80d34e89d40cbc9f3b30eeb2147c98eea'
-      }
-    }).then(function (response) {
+    axios.get(environment.getByKeyword(objSearch.region, objSearch.order_by, objSearch.sort_by, objSearch.keyword, page)).then(function (response) {
       response.data.results.length == 0 ? that.noData = true : that.noData = false;
       that.searchResults = response.data;
       that.pageControl = that.getPager(response.data.count, page);
       that.currentPage = page;
+      that.loading = false;
     }).catch(function (error) {
       that.noData = true;
       console.log(error);
@@ -229,7 +222,8 @@ export class MainComponent implements OnInit {
       for (let i = 1; i <= 5; i++) {
         let obj = {
           id: i,
-          image: "/assets/imgs/default_thumbnail.jpg"
+          image: "/assets/imgs/default_thumbnail.jpg",
+          video_id: null
         }
         this.dataVideo.thumb_style.thumb_arr.push(obj);
       }
@@ -244,7 +238,9 @@ export class MainComponent implements OnInit {
             if (_el == undefined) return;
             if (_el.image.indexOf(";base64,") == -1) {
               _el.image = el.image;
+              _el.video_id = el.video_id;
               el.image = "/assets/imgs/default_thumbnail.jpg";
+              el.video_id = null;
             }
           }
         }
@@ -258,6 +254,7 @@ export class MainComponent implements OnInit {
   editThumbnail(id) {
     this.idThumbnailSelect = id;
     this.chooseThumbnail = true;
+    this.thumbnailError = false;
   }
 
   searchObj: any = {
@@ -305,13 +302,14 @@ export class MainComponent implements OnInit {
     return (hrs > 9 ? hrs : "0" + hrs) + ":" + (mins > 9 ? mins : "0" + mins) + ":" + (secs > 9 ? secs : "0" + secs);
   }
 
-  public async capture() {
+  public async capture(id) {
     this.canvas.nativeElement.width = this.video.nativeElement.videoWidth;
     this.canvas.nativeElement.height = this.video.nativeElement.videoHeight;
     await this.canvas.nativeElement.getContext("2d").drawImage(this.video.nativeElement, 0, 0, this.video.nativeElement.videoWidth, this.video.nativeElement.videoHeight);
     this.dataVideo.thumb_style.thumb_arr.forEach(item => {
       if (item.id == this.idThumbnailSelect) {
         item.image = this.canvas.nativeElement.toDataURL("image/png");
+        item.video_id = id;
         this.resetViewVideo();
         setTimeout(() => {
           this.chooseThumbnail = false;

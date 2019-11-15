@@ -7,7 +7,6 @@ import { provideModuleMap } from '@nguniversal/module-map-ngfactory-loader';
 
 import * as express from 'express';
 import { join } from 'path';
-import axios from 'axios';
 
 require('dotenv').config();
 
@@ -46,8 +45,14 @@ enableProdMode();
 // Express server
 export const app = express();
 
+var bodyParser = require('body-parser');
+const axios = require('axios');
+
 // * NOTE :: leave this as require() since this file is built Dynamically from webpack
 const { AppServerModuleNgFactory, LAZY_MODULE_MAP } = require('./dist/server/main');
+
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+app.use(bodyParser.json({ limit: '50mb' }));
 
 // Our Universal express-engine (found @ https://github.com/angular/universal/tree/master/modules/express-engine)
 app.engine('html', ngExpressEngine({
@@ -59,6 +64,36 @@ app.engine('html', ngExpressEngine({
 
 app.set('view engine', 'html');
 app.set('views', DIST_FOLDER);
+
+app.get('/api/v1/video', async (req, res) => {
+  await axios.get(`${process.env.API_V1}${req.originalUrl.toString()}`, {
+    headers: {
+      Authorization: process.env.TOKEN
+    }
+  }).then(function (response) {
+    if (response.data.next) {
+      response.data.next = response.data.next.replace(`${process.env.API_V1}`, '');
+    }
+    if (response.data.previous) {
+      response.data.previous = response.data.previous.replace(`${process.env.API_V1}`, '');
+    }
+    res.status(response.status).send(response.data);
+  }).catch(function (error) {
+    res.status(error.status).send(error.data);
+  });
+});
+
+app.post('/api/v1/upload', async (req, res) => {
+  await axios.post(`${process.env.API_V1}${req.originalUrl.toString()}`, req.body, {
+    headers: {
+      Authorization: process.env.TOKEN
+    }
+  }).then(function (response) {
+    res.status(response.status).send(response.data);
+  }).catch(function (error) {
+    res.status(error.status).send(error.data);
+  });
+})
 
 // Example Express Rest API endpoints
 // app.get('/api/**', (req, res) => { });
