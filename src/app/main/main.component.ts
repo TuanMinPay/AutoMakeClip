@@ -73,28 +73,28 @@ export class MainComponent implements OnInit {
         }
         await axios.post(environment.uploadImage, obj).then(function (response) {
           item.image = response.data.image;
+          if (index == (that.dataVideo.thumb_style.thumb_arr.length - 1)) {
+            let obj = {
+              channel_id: that.channel_id,
+              make_list: that.dataVideo
+            }
+            axios.post(environment.saveApi, obj).then(function (response) {
+              that.loadingSave = false;
+              Swal.fire({
+                icon: 'success',
+                title: 'Save video successfully'
+              });
+            }).catch(function (error) {
+              that.loadingSave = false;
+              Swal.fire({
+                icon: 'error',
+                title: 'Someting went wrong',
+                text: 'Oops...'
+              });
+              console.log(error);
+            });
+          }
         }).catch(function (error) {
-          console.log(error);
-        });
-      }
-      if (index == (this.dataVideo.thumb_style.thumb_arr.length - 1)) {
-        let obj = {
-          channel_id: this.channel_id,
-          make_list: this.dataVideo
-        }
-        await axios.post(environment.saveApi, obj).then(function (response) {
-          that.loadingSave = false;
-          Swal.fire({
-            icon: 'success',
-            title: 'Save video successfully'
-          });
-        }).catch(function (error) {
-          that.loadingSave = false;
-          Swal.fire({
-            icon: 'error',
-            title: 'Someting went wrong',
-            text: 'Oops...'
-          });
           console.log(error);
         });
       }
