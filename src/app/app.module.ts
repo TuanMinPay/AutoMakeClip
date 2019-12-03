@@ -11,6 +11,7 @@ import { MainComponent } from './main/main.component';
 import { FormsModule } from '@angular/forms';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { DragulaModule } from 'ng2-dragula';
+import { DateTimePickerModule } from '@syncfusion/ej2-angular-calendars';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import { DragulaModule } from 'ng2-dragula';
     NgtUniversalModule,
     FormsModule,
     DragDropModule,
-    DragulaModule.forRoot()
+    DragulaModule.forRoot(),
+    DateTimePickerModule
   ],
   providers: [],
   bootstrap: [AppComponent]

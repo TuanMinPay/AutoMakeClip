@@ -5,7 +5,12 @@ export const environment = {
   },
   uploadImage: '/api/v1/upload/',
   saveApi: '/api/v1/make/',
-  youtubeChannelInfo(id: any) { return `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=${id}&key=AIzaSyBE4o11lhLuqOLwk6-OBUPPFBmZ1jGps9E` },
+  getOldClip(channel_id: any) { return `/api/v1/make/?channel_id=${channel_id}` },
+  configApi: '/api/v1/config/',
+  make: '/makevideo',
+  updateConfig(id: any) { return `/api/v1/config/${id}/` },
+  getConfig(channel_id: any) { return `/api/v1/config/?channel_id=${channel_id}` },
+  youtubeChannelInfo(id: any) { return `/api/v1/channel/${id}` },
   listStyle: [{
     id: 1,
     group: 3,

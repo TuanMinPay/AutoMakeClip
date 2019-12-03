@@ -4,13 +4,17 @@
 
 export const environment = {
   production: false,
-  api_v1: 'http://xx.xx.xx.xx:xxxx',
   getByKeyword(region: any, order_by: any, order_type: any, tags: any, page: any) {
-    return `${this.api_v1}/api/v1/video/?order_type=${order_type}&tags_name=${tags}&page=${page}${(region != null) ? `&region=${region}` : ''}${(order_by != null) ? `&order_by=${order_by}` : ''}`
+    return `http://xx.xx.xx.xx.xxx/api/v1/video/?order_type=${order_type}&tags_name=${tags}&page=${page}${(region != null) ? `&region=${region}` : ''}${(order_by != null) ? `&order_by=${order_by}` : ''}`
   },
-  uploadImage: `${this.api_v1}/api/v1/upload/`,
-  saveApi: `${this.api_v1}/api/v1/make/`,
-  youtubeChannelInfo(id: any) { return `https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=${id}&key=AIzaSyBE4o11lhLuqOLwk6-OBUPPFBmZ1jGps9E` },
+  uploadImage: `http://xx.xx.xx.xx.xxx/api/v1/upload/`,
+  saveApi: `http://xx.xx.xx.xx.xxx/api/v1/make/`,
+  configApi: 'http://xx.xx.xx.xx.xxx/api/v1/config/',
+  getOldClip(channel_id: any) { return `http://xx.xx.xx.xx.xxx/api/v1/make/?channel_id=${channel_id}` },
+  make: 'http://xx.xx.xx.xx.xxx/makevideo',
+  updateConfig(id: any) { return `http://xx.xx.xx.xx.xxx/api/v1/config/${id}/` },
+  getConfig(channel_id: any) { return `http://xx.xx.xx.xx.xxx/api/v1/config/?channel_id=${channel_id}` },
+  youtubeChannelInfo(id: any) { return `/api/v1/channel/${id}` },
   listStyle: [{
     id: 1,
     group: 3,

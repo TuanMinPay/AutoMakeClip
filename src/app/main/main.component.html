@@ -4,11 +4,16 @@
       <div class="pd-t-20 pd-b-10 pd-x-10">
         <label class="tx-sans tx-uppercase tx-medium tx-10 tx-spacing-1 tx-color-03 pd-l-10">Step</label>
         <nav class="nav nav-sidebar nav-pills tx-13" id="navBar">
-          <a href="#searchClip" class="nav-link active"><i data-feather="anchor"></i> <span>Search Clip</span></a>
-          <a href="#chooseClip" class="nav-link"><i data-feather="activity"></i> <span>Choose Clip</span></a>
-          <a href="#makeThumbnail" class="nav-link"><i data-feather="image"></i> <span>Make Thumbnail</span></a>
-          <a href="#videoInfomation" class="nav-link"><i data-feather="clipboard"></i> <span>Video Infomation</span></a>
-          <a href="#saveVideo" class="nav-link"><i data-feather="aperture"></i> <span>Save</span></a>
+          <a href="javascript:void(0)" (click)="changeUrl('#searchClip')" class="nav-link active"><i
+              data-feather="anchor"></i> <span>Search Clip</span></a>
+          <a href="javascript:void(0)" (click)="changeUrl('#chooseClip')" class="nav-link"><i
+              data-feather="activity"></i> <span>Choose Clip</span></a>
+          <a href="javascript:void(0)" (click)="changeUrl('#makeThumbnail')" class="nav-link"><i
+              data-feather="image"></i> <span>Make Thumbnail</span></a>
+          <a href="javascript:void(0)" (click)="changeUrl('#videoInfomation')" class="nav-link"><i
+              data-feather="clipboard"></i> <span>Video Infomation</span></a>
+          <a href="javascript:void(0)" (click)="changeUrl('#saveVideo')" class="nav-link"><i
+              data-feather="aperture"></i> <span>Save</span></a>
         </nav>
       </div>
     </div><!-- filemgr-sidebar-body -->
@@ -21,7 +26,7 @@
           <label>Keyword <span class="tx-danger">*</span></label>
           <input type="text" class="form-control {{validateSearch.keyword ? 'parsley-error' : ''}}"
             [(ngModel)]="searchObj.keyword" name="keyword" placeholder="halloween"
-            (keyup)="validateSearch.keyword = false" (keyup.enter)="search()">
+            (keyup)="validateSearch.keyword = false" (keyup.enter)="search()" autofocus>
         </div>
         <div class="form-group col-md-2">
           <label>Region</label>
@@ -35,7 +40,7 @@
             <option value="like_count">Like</option>
             <option value="comment_count">Comment</option>
             <option value="music__posts">Music Posts</option>
-            <option value="tag__views">Tag Views</option>
+            <option value="tags__views">Tag Views</option>
             <option value="author__fans">Author Fans</option>
             <option value="author__heart">Author Heart</option>
           </select>
@@ -56,21 +61,16 @@
       </div>
     </div><!-- filemgr-content-header -->
     <div class="filemgr-content-body" data-spy="scroll" data-target="#navBar">
-      <div id="loading" #loading *ngIf="searchResults == null">
-        <div class="spinner-grow" role="status">
-          <span class="sr-only">Loading...</span>
-        </div>
-      </div>
       <div class="pd-20 pd-lg-25 pd-xl-30" *ngIf="searchResults != null" id="searchClip">
         <div data-label="Search Results" class="df-example">
           <div class="row row-xs" *ngIf="!noData">
             <div *ngFor="let item of searchResults?.results"
               class="col-2 item-video {{listIdVideo.indexOf(item.id) != -1 ? 'muted' : ''}}"
-              (mouseenter)="previewVideo(item.id, false)">
+              (mouseenter)="previewVideo(item, false)">
               <div class="card card-file" (mouseenter)="showAction(item.id)" (mouseleave)="hideAction()">
                 <div class="card-file-thumb tx-danger">
                   <button class="btn btn-xs btn-success action-btn" (click)="addVideoToList(item)"
-                    *ngIf="actionDisplay == item.id && listIdVideo.indexOf(item.id) == -1">+</button>
+                    *ngIf="actionDisplay == item.id && listIdVideo.indexOf(item.id) == -1">+ {{(listWarning.indexOf(item.id) == -1) ? '' : 'Clip Exist'}}</button>
                   <img [src]="item.thumbnail_url" class="img-srs"
                     *ngIf="actionDisplay != item.id || listIdVideo.indexOf(item.id) != -1">
                   <video #prv *ngIf="actionDisplay == item.id && listIdVideo.indexOf(item.id) == -1"
@@ -81,7 +81,7 @@
                   </video>
                 </div>
                 <div class="card-body">
-                  <h6 (click)="previewVideo(item.id, true)" data-toggle="modal" data-target="#modalSplitColumn"><a
+                  <h6 (click)="previewVideo(item, true)" data-toggle="modal" data-target="#modalSplitColumn"><a
                       href="javascript:void(0)" class="link-02">{{item.text}}</a>
                   </h6>
                   <span>{{item.region}}</span>
@@ -111,11 +111,14 @@
       </div>
 
       <div class="pd-20 pd-lg-25 pd-xl-30" *ngIf="dataVideo.list_video.length > 0" id="chooseClip" #chooseClip>
+        <div class="btn-reset">
+            <button class="btn btn-danger" (click)="resetData()">Reset Data</button>
+        </div>
         <div data-label="Choose Results" class="df-example">
           <span>Selected: <strong>{{dataVideo.list_video.length}}</strong> clips, estimate duration:
             <strong>{{gettime(dataVideo.list_video.length * 10)}}s</strong></span>
           <div class="row row-xs mg-t-10 result-boundary" dragula="LIST_VIDEO" [(dragulaModel)]="dataVideo.list_video">
-            <div class="col-2 item-video example-box" *ngFor="let item of dataVideo.list_video">
+            <div class="col-2 item-video example-box" *ngFor="let item of dataVideo.list_video" (mouseenter)="previewVideo(item, false)">
               <div class="card card-file" (mouseenter)="showActionRemove(item.id)" (mouseleave)="hideActionRemove()">
                 <div class="card-file-thumb tx-danger">
                   <div class="action-btn" *ngIf="actionRemove == item.id || chooseThumbnail">
@@ -123,7 +126,13 @@
                       data-target="#modalSplitColumn" *ngIf="chooseThumbnail">Capture</button>
                     <button class="btn btn-xs btn-danger" (click)="removeVideoFromList(item)">-</button>
                   </div>
-                  <img [src]="item.thumbnail_url" class="img-srs">
+                  <img [src]="item.thumbnail_url" class="img-srs" *ngIf="actionRemove != item.id">
+                  <video #prv *ngIf="actionRemove == item.id && dataSelected.id == item.id"
+                    class="wd-100p img-fit-cover img-object-top rounded-left img-srs" autoplay
+                    poster="../../assets/imgs/abc.gif" crossorigin="anonymous" style="object-fit: contain;">
+                    <source [src]="dataSelected?.video_link" type="video/mp4">
+                    Your browser does not support HTML5 video.
+                  </video>
                 </div>
                 <div class="card-body">
                   <h6><a href="javascript:void(0)" class="link-02">{{item.text}}</a></h6>
@@ -179,11 +188,25 @@
             <input type="text" name="tags" [(ngModel)]="dataVideo.tags" class="form-control"
               placeholder="halloween, ghost, ...etc">
           </div>
+          <div class="form-group" *ngIf="textSaveConfig != null" [innerHTML]="textSaveConfig"></div>
+          <button type="button" class="btn btn-success"
+            *ngIf="dataVideo.title != null && dataVideo.description != null && dataVideo.tags != null"
+            (click)="saveConfig()">{{hasConfig ? 'Update Config' : 'Save Config'}}</button>
+          <div class="spinner-border mg-l-10 pos-absolute" role="status" *ngIf="isLoadingConfig">
+            <span class="sr-only">Loading...</span>
+          </div>
+        </div>
+      </div>
+
+      <div class='pd-20 pd-lg-25 pd-xl-30' *ngIf="styleSelected != null">
+        <div class="form-group">
+          <label for="dateTime">Time</label>
+          <ejs-datetimepicker [(ngModel)]="dateTime" id="dateTime" placeholder='Select a date'></ejs-datetimepicker>
         </div>
       </div>
 
       <div class="pd-20 pd-lg-25 pd-xl-30" id="saveVideo" style="display: inline-flex;" *ngIf="styleSelected != null">
-        <button type="button" class="btn btn-success" (click)="save()">Save</button>
+        <button type="button" class="btn btn-success" [disabled]="dateTime == undefined" (click)="save()">Save</button>
         <div class="spinner-border mg-l-10" role="status" *ngIf="loadingSave">
           <span class="sr-only">Loading...</span>
         </div>

@@ -107,6 +107,76 @@ app.post('/api/v1/make', async (req, res) => {
   });
 });
 
+app.get('/api/v1/make', async (req, res) => {
+  await axios.get(`${process.env.API_V1}${req.originalUrl.toString()}`, {
+    headers: {
+      Authorization: process.env.TOKEN
+    }
+  }).then(function (response) {
+    if (response.data.next) {
+      response.data.next = response.data.next.replace(`${process.env.API_V1}`, '');
+    }
+    if (response.data.previous) {
+      response.data.previous = response.data.previous.replace(`${process.env.API_V1}`, '');
+    }
+    res.status(response.status).send(response.data);
+  }).catch(function (error) {
+    res.status(error.status).send(error.data);
+  });
+});
+
+app.get('/api/v1/config', async (req, res) => {
+  await axios.get(`${process.env.API_V1}${req.originalUrl.toString()}`, {
+    headers: {
+      Authorization: process.env.TOKEN
+    }
+  }).then(function (response) {
+    res.status(response.status).send(response.data);
+  }).catch(function (error) {
+    res.status(error.status).send(error.data);
+  });
+});
+
+app.post('/api/v1/config', async (req, res) => {
+  await axios.post(`${process.env.API_V1}${req.originalUrl.toString()}`, req.body, {
+    headers: {
+      Authorization: process.env.TOKEN
+    }
+  }).then(function (response) {
+    res.status(response.status).send(response.data);
+  }).catch(function (error) {
+    res.status(error.status).send(error.data);
+  });
+});
+
+app.put('/api/v1/config/:id', async (req, res) => {
+  await axios.put(`${process.env.API_V1}${req.originalUrl.toString()}`, req.body, {
+    headers: {
+      Authorization: process.env.TOKEN
+    }
+  }).then(function (response) {
+    res.status(response.status).send(response.data);
+  }).catch(function (error) {
+    res.status(error.status).send(error.data);
+  });
+});
+
+app.get('/api/v1/channel/:id', async (req, res) => {
+  await axios.get(`https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&id=${req.params.id}&key=${process.env.GOOGLE_API_KEY}`).then(function (response) {
+    res.status(response.status).send(response.data);
+  }).catch(function (error) {
+    res.status(error.status).send(error.data);
+  });
+});
+
+app.post('/makevideo', async (req, res) => {
+  await axios.post(`${process.env.MAKE}${req.originalUrl.toString()}`, req.body).then(function (response) {
+    res.status(response.status).send(response.data);
+  }).catch(function (error) {
+    res.status(error.status).send(error.data);
+  });
+});
+
 // Example Express Rest API endpoints
 // app.get('/api/**', (req, res) => { });
 // Serve static files from /browser

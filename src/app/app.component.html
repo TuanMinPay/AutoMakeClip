@@ -10,10 +10,10 @@
     </div><!-- navbar-menu-header -->
   </div><!-- navbar-menu-wrapper -->
   <div class="navbar-right" *ngIf="channel_info != null">
-    Channel:&nbsp;<strong>{{channel_info.items[0].snippet.title}}</strong>&nbsp;- Total
-      views:&nbsp;<strong>{{channel_info.items[0].statistics.viewCount | number:'':'vi'}}</strong>&nbsp;- Total
-      videos:&nbsp;<strong>{{channel_info.items[0].statistics.videoCount | number:'':'vi'}}</strong>&nbsp;- Total
-      subscribers:&nbsp;<strong>{{channel_info.items[0].statistics.subscriberCount | number:'':'vi'}}</strong>
+    Channel:&nbsp;<strong>{{channel_info?.items[0].snippet.title}}</strong>&nbsp;- Total
+      views:&nbsp;<strong>{{channel_info?.items[0].statistics.viewCount | number:'':'vi'}}</strong>&nbsp;- Total
+      videos:&nbsp;<strong>{{channel_info?.items[0].statistics.videoCount | number:'':'vi'}}</strong>&nbsp;- Total
+      subscribers:&nbsp;<strong>{{channel_info?.items[0].statistics.subscriberCount | number:'':'vi'}}</strong>
   </div>
   <div class="navbar-search">
     <div class="navbar-search-header">

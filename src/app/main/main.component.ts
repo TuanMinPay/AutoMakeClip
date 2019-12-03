@@ -54,6 +54,36 @@ export class MainComponent implements OnInit {
 
   loadingSave: boolean = false;
 
+  sendMake(id) {
+    const that = this;
+    let obj = {
+      id: id
+    }
+    axios.post(environment.make, obj).then(function (response) {
+      that.loadingSave = false;
+      var data: any = response.data;
+      if (data.status == 'success') {
+        Swal.fire({
+          icon: 'success',
+          title: data.message
+        });
+      } else if (data.status == 'danger') {
+        Swal.fire({
+          icon: 'error',
+          title: data.message
+        });
+      }
+    }).catch(function (error) {
+      that.loadingSave = false;
+      Swal.fire({
+        icon: 'error',
+        title: 'Someting went wrong',
+        text: 'Oops...'
+      });
+      console.log(error);
+    });
+  }
+
   save() {
     const that = this;
     if (this.loadingSave) return;
@@ -62,7 +92,7 @@ export class MainComponent implements OnInit {
     if (this.dataVideo.thumb_style.style.group == 3) {
       this.dataVideo.thumb_style.thumb_arr = this.dataVideo.thumb_style.thumb_arr.slice(0, 3);
     }
-    this.dataVideo.thumb_style.thumb_arr.forEach(async (item, index) => {
+    var prm = this.dataVideo.thumb_style.thumb_arr.map(async item => {
       if (item.image.indexOf(";base64,") == -1 && item.image.indexOf("http://") == -1) {
         this.thumbnail.nativeElement.scrollIntoView({ block: 'start', behavior: 'smooth', inline: 'nearest' });
         this.thumbnailError = true;
@@ -73,33 +103,97 @@ export class MainComponent implements OnInit {
         }
         await axios.post(environment.uploadImage, obj).then(function (response) {
           item.image = response.data.image;
-          if (index == (that.dataVideo.thumb_style.thumb_arr.length - 1)) {
-            let obj = {
-              channel_id: that.channel_id,
-              make_list: that.dataVideo
-            }
-            axios.post(environment.saveApi, obj).then(function (response) {
-              that.loadingSave = false;
-              Swal.fire({
-                icon: 'success',
-                title: 'Save video successfully'
-              });
-            }).catch(function (error) {
-              that.loadingSave = false;
-              Swal.fire({
-                icon: 'error',
-                title: 'Someting went wrong',
-                text: 'Oops...'
-              });
-              console.log(error);
-            });
-          }
+          return;
         }).catch(function (error) {
+          item.image = null;
           console.log(error);
+          return;
         });
       }
     });
+    Promise.all(prm).then(() => {
+      let obj = {
+        channel_id: that.channel_id,
+        make_list: that.dataVideo
+      }
+      axios.post(environment.saveApi, obj).then(function (response) {
+        that.sendMake(response.data.id);
+        console.log("Send make");
+      }).catch(function (error) {
+        that.loadingSave = false;
+        Swal.fire({
+          icon: 'error',
+          title: 'Someting went wrong',
+          text: 'Oops...'
+        });
+        console.log(error);
+      });
+    });
+  }
 
+  hasConfig: boolean = false;
+  dataConfig: any = null;
+
+  async getConfig(url) {
+    const that = this;
+    await axios.get(url).then(function (response) {
+      if (response.data.count > 0) {
+        var data = response.data.results[0];
+        that.dataVideo.title = data.title;
+        that.dataVideo.description = data.description;
+        that.dataVideo.tags = data.tags;
+        that.hasConfig = true;
+        that.dataConfig = data;
+      }
+    }).catch(function (error) {
+      that.hasConfig = false;
+      console.log(error);
+    });
+  }
+
+  changeUrl(hash) {
+    var url = window.location.href;
+    if (url.indexOf('#') != -1) {
+      url = url.split('#')[0];
+    }
+    window.location.href = `${url}${hash}`;
+  }
+
+  isLoadingConfig: boolean = false;
+  textSaveConfig: string = null;
+  async saveConfig() {
+    const that = this;
+    if (that.isLoadingConfig) return;
+    that.textSaveConfig = null;
+    that.isLoadingConfig = true;
+    if (that.hasConfig) {
+      that.dataConfig.title = that.dataVideo.title;
+      that.dataConfig.description = that.dataVideo.description;
+      that.dataConfig.tags = that.dataVideo.tags;
+      await axios.put(environment.updateConfig(that.dataConfig.id), that.dataConfig).then(function (response) {
+        that.textSaveConfig = `<p class="text-success">Config updated</p>`;
+        that.isLoadingConfig = false;
+      }).catch(function (error) {
+        that.isLoadingConfig = false;
+        that.textSaveConfig = `<p class="text-danger">Something went wrong</p>`;
+        console.log(error);
+      });
+    } else {
+      let obj = {
+        channel_id: that.channel_id,
+        title: that.dataVideo.title,
+        description: that.dataVideo.description,
+        tags: that.dataVideo.tags
+      }
+      await axios.post(environment.configApi, obj).then(function (response) {
+        that.textSaveConfig = `<p class="text-success">Config saved</p>`;
+        that.isLoadingConfig = false;
+      }).catch(function (error) {
+        that.isLoadingConfig = false;
+        that.textSaveConfig = `<p class="text-danger">Something went wrong</p>`;
+        console.log(error);
+      });
+    }
   }
 
   addVideoToList(item: any) {
@@ -131,6 +225,17 @@ export class MainComponent implements OnInit {
 
   hideActionRemove() {
     this.actionRemove = null;
+  }
+
+  resetData() {
+    this.styleSelected = null;
+    this.dataVideo.list_video = [];
+    this.dataVideo.thumb_style = {
+      style: null,
+      thumb_arr: []
+    };
+    this.listIdVideo = [];
+    this.getOldData();
   }
 
   pageControl: any = [];
@@ -212,11 +317,6 @@ export class MainComponent implements OnInit {
     this.getData(this.searchObj, page);
   }
 
-  getItemVideo(id: any) {
-    return this.searchResults.results.filter((item: { id: any; }) => {
-      return item.id === id;
-    })[0];
-  }
   dataSelected: any = null;
 
   openModal: boolean = false;
@@ -228,9 +328,9 @@ export class MainComponent implements OnInit {
     })[0];
   }
 
-  previewVideo(id: any, open: boolean) {
+  previewVideo(item: any, open: boolean) {
     this.openModal = open;
-    this.dataSelected = this.getItemVideo(id);
+    this.dataSelected = item;
   }
 
   resetViewVideo() {
@@ -320,22 +420,75 @@ export class MainComponent implements OnInit {
   channel_info: any;
   @Output() messageEvent = new EventEmitter<string>();
 
+  getMoreDataChannel(url) {
+    const that = this;
+    axios.get(url).then(function (response) {
+      var newArr = [...that.listOldData, ...response.data.results];
+      that.listOldData = newArr;
+      if (response.data.next != null) {
+        that.getMoreDataChannel(response.data.next);
+      } else {
+        that.handleWarning();
+      }
+    }).catch(function (error) {
+      console.log(error);
+    });
+  }
+
+  listOldData: any = null;
+
+  handleWarning() {
+    this.listOldData.forEach(clips => {
+      clips.make_list.list_video.forEach(clip => {
+        if (this.listWarning.indexOf(clip.id) == -1) {
+          this.listWarning.push(clip.id);
+        }
+      });
+    });
+  }
+
+  listWarning: any = [];
+
+  getOldData() {
+    const that = this;
+    axios.get(environment.getOldClip(this.channel_id)).then(function (response) {
+      that.listOldData = response.data.results;
+      if (response.data.next != null) {
+        that.getMoreDataChannel(response.data.next);
+      } else {
+        that.handleWarning();
+      }
+    }).catch(function (error) {
+      console.log(error);
+    });
+  }
+
   ngOnInit() {
     const that = this;
     this.channel_id = this.route.snapshot.queryParamMap.get('channel_id');
-    if (this.channel_id == null) {
+    if (this.channel_id == null || this.channel_id.trim() == '') {
       Swal.fire({
         icon: 'error',
         title: 'Channel id is null',
         text: 'Oops...'
       });
     } else {
+      that.getOldData();
       axios.get(environment.youtubeChannelInfo(this.channel_id)).then(function (response) {
         that.channel_info = response.data;
-        that.data.changeMessage(that.channel_info);
+        if (that.channel_info.items.length == 0) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Channel not found',
+            text: 'Oops...'
+          });
+        } else {
+          that.data.changeMessage(that.channel_info);
+        }
       }).catch(function (error) {
         console.log(error);
       });
+      this.getConfig(environment.getConfig(this.channel_id));
     }
     this.listThumbnailStyle = environment.listStyle;
     registerLocaleData(vi);
